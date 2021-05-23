@@ -1,0 +1,2 @@
+Board: 98x66, Pivots: (5, 56) | (94, 56)
+Wheel: 40x40
