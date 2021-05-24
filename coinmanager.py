@@ -98,7 +98,7 @@ class CoinManager(pg.sprite.Sprite):
                                                              (round(DIMENSIONS[0]*self.game.zoom),
                                                               round(DIMENSIONS[1]*self.game.zoom))), pos)
                 else:
-                    pos = coin.body.position - Vec(self.rect.centerx, self.rect.centery) - self.game.camera
+                    pos = coin.body.position - Vec(self.rect.centerx, self.rect.centery)
                     self.game.screen.blit(self.idle_images[counter], pos)
             else:
                 if round(coin.collected_counter) > (COLLECTED_ANIM_SIZE - 1):
@@ -115,5 +115,5 @@ class CoinManager(pg.sprite.Sprite):
                                                             (round(DIMENSIONS[0] * self.game.zoom),
                                                              round(DIMENSIONS[1] * self.game.zoom))), pos)
                 else:
-                    pos = coin.body.position - Vec(self.rect.centerx, self.rect.centery) - self.game.camera
+                    pos = coin.body.position - Vec(self.rect.centerx, self.rect.centery)
                     self.game.screen.blit(self.collected_images[counter], pos)

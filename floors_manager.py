@@ -16,12 +16,12 @@ class FloorsManager(pygame.sprite.Sprite):
         self.game = game
 
     def start(self):
-        # self.all.append(Line(self.game, position=vec(x, y), final_pos=vec(x, y) + vec(512, -256), width=WIDTH))
+        # self.all.append(Line(self.game, position=Vec(x, y), final_pos=Vec(x, y) + Vec(512, -256), width=WIDTH))
         self.all.append(HorizontalLine(game=self.game, position=vec(*INITIALPOS), length=800,
                                        width=WIDTH))
-        # self.all.append(ParabolaDown(game=self.game, position=vec(x, y), length=500, height=800, width=WIDTH))
+        # self.all.append(ParabolaDown(game=self.game, position=Vec(x, y), length=500, height=800, width=WIDTH))
         # lastfloor: Floor = self.all[-1]
-        # self.all.append(ParabolaUp(game=self.game, position=vec(x, y), length=600, height=-800,
+        # self.all.append(ParabolaUp(game=self.game, position=Vec(x, y), length=600, height=-800,
         #                          width=WIDTH))
         # self.game.coin_manager.generate(self.all[-1])
 
@@ -33,7 +33,7 @@ class FloorsManager(pygame.sprite.Sprite):
             #                                length=800, width=WIDTH))
             selection = randint(1, 2)
             le = randint(500, 1400)
-            selection = 2
+            # selection = 2
             if selection == 1:
                 if len(self.all) > 2:  # LINE
                     h = randint(-60 * le, 80 * le) / 100

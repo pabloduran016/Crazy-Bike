@@ -3,6 +3,8 @@ import pymunk
 from pymunk import Vec2d as Vec
 from settings.WHEEL import *
 from functions import blitrotate, scale, rad_to_degrees
+import random
+from math import cos, sin
 # from functions import load_svg
 
 
@@ -47,10 +49,7 @@ class Wheel(pygame.sprite.Sprite):
         if self.id == 'backwheel':
             self.body.angular_velocity *= AIR_DRAG_MULTIPLIER
         if self.game.crushed:
-            if self.id == 'bakcwheel':
-                self.body.velocity = (2, -5)
-            elif self.id == 'frontwheel':
-                self.body.velocity = (-2, -5)
+            self.body.angular_velocity = random.randint(-300, 300)/100
             self.shape.sensor = True
 
     def draw(self):

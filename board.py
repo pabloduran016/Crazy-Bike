@@ -63,7 +63,8 @@ class Board(pygame.sprite.Sprite):
             im, pos = blitrotate(self.image, self.body.position - self.game.camera, self.pivot, self.angle)
             self.game.screen.blit(im, pos)
             self.game.space.gravity = (0, 0)
-            self.body.velocity = (0, 5)
+            self.body.velocity = (0, 0)
+            self.body.angular_velocity = 0
             self.shape.sensor = True
 
     def draw(self):
@@ -80,5 +81,6 @@ class Board(pygame.sprite.Sprite):
         self.body.position = self.body_a.body.position
 
     def check_ground_begin(self, arbiter, space, data):
-        self.game.crushed = True
+        if not self.game.crushed:
+            self.game.crushed = True
         return True

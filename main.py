@@ -1,6 +1,7 @@
 import pygame as pg
 import pygame.freetype as pg_ft
 import pymunk as pk
+from pymunk import Vec2d as Vec
 import pymunk.pygame_util
 from settings import *
 from wheel import Wheel
@@ -12,14 +13,14 @@ from board import Board
 from coin import Coin
 from sprite import SpriteGroup
 from screens import StartScreen, GoScreen
-from functions import normalize
-import matplotlib.pylab as plt
-vec = pk.Vec2d
 
 
-var = []
-var2 = []
-var3 = []
+# from functions import normalize
+# import matplotlib.pylab as plt
+
+# var = []
+# var2 = []
+# var3 = []
 
 
 class Game:
@@ -49,9 +50,9 @@ class Game:
         self.background = Background(self)
         self.foreground = Foreground(self)
         self.all_sprites = SpriteGroup()
-        self.crushed = False
-        self.camera = vec(0, 0)
-        self.camera_initial_position = vec(*CAMERA_INITIAL_POSITION)
+        self._crushed = False
+        self.camera = Vec(0, 0)
+        self.camera_focus = Vec(*CAMERA_INITIAL_POSITION)
         self.font = pg_ft.Font(ARCADECLASSIC)
         self.coins_collected = 0
         self.flips = 0
@@ -63,8 +64,16 @@ class Game:
                          'grass': pg.image.load(TEXTURES.GRASS).convert()}
         self.textures['ground'].set_colorkey((255, 255, 255))
         self.textures['grass'].set_colorkey((255, 255, 255))
-        self.camera_counter = 0
+        self.go_counter = 0
         # self.mouse_coins = []
+
+    @property
+    def crushed(self):
+        return self._crushed
+
+    @crushed.setter
+    def crushed(self, value):
+        self._crushed = value
 
     @property
     def zoom(self):
@@ -73,16 +82,19 @@ class Game:
     @zoom.setter
     def zoom(self, value):
         self._zoom = value
-        self.displacement = self.camera_initial_position * (1 - self.zoom)
+        self.displacement = self.camera_focus * (1 - self.zoom)
 
     def new(self):
         # Start a new game
+        self.crushed = False
         self.space = pk.Space()  # Create Pymunk Space
         self.space.gravity = GRAVITY  # Establish Gravity in Pymunk Space
+        self.camera_focus = Vec(*CAMERA_INITIAL_POSITION)
+        self.camera = Vec(0, 0)
         self.coins_collected = 0
-        self.camera = vec(0, 0)
-        self.crushed = False
-        self.camera_counter = 0
+        self.zoom = ZOOM
+        self.camera = Vec(0, 0)
+        self.go_counter = 0
         self.flips = 0
         self.all_sprites = SpriteGroup()
         self.backwheel = Wheel(self, 'backwheel')  # Create a Backwheel object add it to Pymunk Space
@@ -102,8 +114,8 @@ class Game:
         self.playing = True
         while self.playing:
             # if self.clock.get_time() % 4 == 0:
-            var.append(abs(self.backwheel.body.velocity))
-            var2.append(abs(self.zoom))
+            # var.append(abs(self.backwheel.body.velocity))
+            # var2.append(abs(self.zoom))
             self.events()
             self.draw()
             self.update()
@@ -116,19 +128,19 @@ class Game:
         self.all_sprites.update()
         if not self.crushed:
             self.camera += (pg.transform.scale(self.board.image,
-                                               (round(BOARD.DIMENSIONS[0]*self.zoom),
-                                                round(BOARD.DIMENSIONS[1]*self.zoom))).get_rect().center +
-                            self.board.body.position*self.zoom - self.camera - self.camera_initial_position*self.zoom)/3
+                                               (round(BOARD.DIMENSIONS[0] * self.zoom),
+                                                round(BOARD.DIMENSIONS[1] * self.zoom))).get_rect().center +
+                            self.board.body.position * self.zoom - self.camera - self.camera_focus * self.zoom) / 3
             # TODO: fix the zooming so that it is smooth and there is not sudden changes
-            self.zoom += (ZOOM - normalize(self.backwheel.body.velocity.length) * ZOOM_VARIABILITY - self.zoom) / 10
-            var3.append(normalize(self.backwheel.body.velocity.length) * ZOOM_VARIABILITY)
+            # self.zoom += (ZOOM - normalize(self.backwheel.body.velocity.length) * ZOOM_VARIABILITY - self.zoom) / 10
+            # var3.append(normalize(self.backwheel.body.velocity.length) * ZOOM_VARIABILITY)
             # normalize makes the argument be between 0 and 1
             pass
-        elif self.camera_counter < 20:
-            self.camera += (-10, 0)
-            self.camera_counter += 1
-            self.zoom += 0.01
-            self.displacement = (self.board.body.position*self.zoom - self.camera) * (1 - self.zoom)
+        elif self.go_counter < 50:
+            # self.camera += (-10, 0)
+            self.go_counter += 1
+            self.zoom += 0.001
+            # self.displacement = (self.board.body.position*self.zoom - self.camera) * (1 - self.zoom)
         else:
             self.playing = False
         self.update_fonts()
@@ -153,18 +165,8 @@ class Game:
                     self.board.reset()
                 if event.key == pg.K_UP:
                     self.zoom += 0.005
-                    self.camera += (pg.transform.scale(self.board.image,
-                                    (round(BOARD.DIMENSIONS[0] * self.zoom),
-                                     round(BOARD.DIMENSIONS[1] * self.zoom))).get_rect().center +
-                                    self.board.body.position * self.zoom - self.camera - self.camera_initial_position *
-                                    self.zoom) / 3
                 if event.key == pg.K_DOWN:
                     self.zoom -= 0.005
-                    self.camera += (pg.transform.scale(self.board.image,
-                                                       (round(BOARD.DIMENSIONS[0] * self.zoom),
-                                                        round(BOARD.DIMENSIONS[1] * self.zoom))).get_rect().center +
-                                    self.board.body.position * self.zoom - self.camera - self.camera_initial_position *
-                                    self.zoom)
             if event.type == pg.MOUSEBUTTONDOWN:
                 if pg.mouse.get_pressed(3)[0] and self.waiting:
                     self.waiting = False
@@ -179,13 +181,13 @@ class Game:
         else:
             self.board.checkground = max(1, self.board.checkground - 1)
         if keys[pg.K_d]:
-            self.camera += vec(40, 0)
+            self.camera += Vec(40, 0)
         if keys[pg.K_a]:
-            self.camera += vec(-40, 0)
+            self.camera += Vec(-40, 0)
         if keys[pg.K_w]:
-            self.camera += vec(0, -40)
+            self.camera += Vec(0, -40)
         if keys[pg.K_s]:
-            self.camera += vec(0, 40)
+            self.camera += Vec(0, 40)
 
     def draw(self):
         self.screen.fill(WHITE)
@@ -222,7 +224,7 @@ class Game:
         # game splash/start screen
         self.waiting = True
         self.coin_manager = CoinManager(self, ss=True)
-        self.coin_manager.coins = [Coin(self, vec(x, y), i - (COIN.IDLE_ANIM_SIZE - 1) *
+        self.coin_manager.coins = [Coin(self, Vec(x, y), i - (COIN.IDLE_ANIM_SIZE - 1) *
                                         (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
         while self.waiting:
             self.events()
@@ -286,9 +288,9 @@ if __name__ == '__main__':
         g.show_go_screen()
 
     pg.quit()
-
-    fig, ax = plt.subplots(3, 1)
-    ax[0].plot(var)
-    ax[1].plot(var2)
-    ax[2].plot(var3)
-    plt.show()
+    #
+    # fig, ax = plt.subplots(3, 1)
+    # ax[0].plot(var)
+    # ax[1].plot(var2)
+    # ax[2].plot(var3)
+    # plt.show()
