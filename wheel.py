@@ -57,7 +57,7 @@ class Wheel(pygame.sprite.Sprite):
         # if not self.game.crushed:
         im = scale(self.image, DIMENSIONS, self.game.zoom)
         rect = im.get_rect()
-        print(rect.size)
+        # print(rect.size)
         rect.center = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
         self.game.screen.blit(*blitrotate(im, Vec(*rect.center), Vec(rect.width/2, rect.height/2),
                                           rad_to_degrees(-self.body.angle)))

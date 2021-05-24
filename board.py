@@ -70,7 +70,7 @@ class Board(pygame.sprite.Sprite):
         im, pos = blitrotate(scale(self.image, DIMENSIONS, self.game.zoom),
                              self.body.position*self.game.zoom - self.game.camera + self.game.displacement,
                              self.pivot*self.game.zoom, self.angle)
-        print(im.get_size())
+        # print(im.get_size())
         self.game.screen.blit(im, pos)
 
     def reset(self):

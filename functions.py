@@ -1,5 +1,5 @@
 import pygame as pg
-from math import pi
+from math import pi, exp
 # import rsvgwrapper
 # import cairo
 # from PIL import Image
@@ -42,6 +42,10 @@ def scale(img, original_dimensions=None, zoom=1):
 
 def rad_to_degrees(angle):
     return angle*180/pi
+
+
+def normalize(x):
+    return 1 / (1 + exp(-.2*x + 5))
 
 
 '''def load_svg(file, size=None):
