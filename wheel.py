@@ -16,16 +16,20 @@ class Wheel(pygame.sprite.Sprite):
         super().__init__()
         self.game = game
         self.id = identity
-
+        assert self.id == 'backwheel' or self.id == 'frontwheel', \
+            f'INVALID ID, expected frontwheel or backwheel, got {identity}'
         self.color = COLOR
         self.radius = RADIUS
         self.width = WIDTH
         self.thetaacc = THETAACC
         # self.image = load_svg(IMAGE, size=DIMENSIONS).convert_alpha()
         self.image = pygame.image.load(IMAGE).convert_alpha()
-        self.initial_position = Vec(*INITIAL_POSITION[self.id])
+        if self.id == 'backwheel':
+            self.initial_position = Vec(*BACKWHEEL_INITIAL_POSITION)
+        elif self.id == 'frontwheel':
+            self.initial_position = Vec(*BACKWHEEL_INITIAL_POSITION) + Vec(DISTANCE, 0)
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
-        self.body.position = INITIAL_POSITION[self.id]
+        self.body.position = self.initial_position
         self.shape = pymunk.Circle(self.body, self.radius)
         self.shape.density = DENSITY
         self.shape.friction = FRICTION
@@ -51,8 +55,9 @@ class Wheel(pygame.sprite.Sprite):
 
     def draw(self):
         # if not self.game.crushed:
-        im = scale(self.image, self.game.zoom)
+        im = scale(self.image, DIMENSIONS, self.game.zoom)
         rect = im.get_rect()
+        print(rect.size)
         rect.center = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
         self.game.screen.blit(*blitrotate(im, Vec(*rect.center), Vec(rect.width/2, rect.height/2),
                                           rad_to_degrees(-self.body.angle)))

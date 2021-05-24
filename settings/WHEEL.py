@@ -1,7 +1,7 @@
 from .colors import RED
+DISTANCE = 90
 # WHEEL SETTINGS
-INITIAL_POSITION = {'backwheel': (80, 600),
-                    'frontwheel': (170, 600)}
+BACKWHEEL_INITIAL_POSITION = (80, 600)
 # INITIAL_POSITION = {'backwheel': (80, 600),
 #                     'frontwheel': (152, 654)}
 DIMENSIONS = (round(40), round(40))

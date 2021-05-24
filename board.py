@@ -2,7 +2,7 @@ import pygame.image
 from joints import pivotjoint
 from settings.BOARD import *
 import pymunk.vec2d
-from functions import blitrotate
+from functions import scale, blitrotate
 vec = pymunk.Vec2d
 
 
@@ -67,10 +67,10 @@ class Board(pygame.sprite.Sprite):
             self.shape.sensor = True
 
     def draw(self):
-        im, pos = blitrotate(pygame.transform.scale(self.image, (round(DIMENSIONS[0]*self.game.zoom),
-                                                                 round(DIMENSIONS[1]*self.game.zoom))),
+        im, pos = blitrotate(scale(self.image, DIMENSIONS, self.game.zoom),
                              self.body.position*self.game.zoom - self.game.camera + self.game.displacement,
                              self.pivot*self.game.zoom, self.angle)
+        print(im.get_size())
         self.game.screen.blit(im, pos)
 
     def reset(self):

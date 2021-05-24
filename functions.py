@@ -35,8 +35,10 @@ def blitrotate(image, pos, originpos, angle):
     return rotated_image, origin
 
 
-def scale(img, zoom):
-    return pg.transform.scale(img, (round(img.get_rect().width*zoom), round(img.get_rect().height*zoom)))
+def scale(img, original_dimensions=None, zoom=1):
+    dim = original_dimensions if original_dimensions is not None else img.get_rect().size
+    return pg.transform.scale(img, (round(dim[0]*zoom), round(dim[1]*zoom)))
+
 
 def rad_to_degrees(angle):
     return angle*180/pi

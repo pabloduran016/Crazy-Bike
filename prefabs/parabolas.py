@@ -44,7 +44,7 @@ class Parabola(Floor):
                       for p in group]
             try:
                 pygame.gfxdraw.textured_polygon(self.game.screen, points,
-                                                scale(self.game.textures[tex], self.game.zoom),
+                                                scale(self.game.textures[tex], zoom=self.game.zoom),
                                                 round(offset.x), -round(offset.y))
             except pygame.error:
                 pass
