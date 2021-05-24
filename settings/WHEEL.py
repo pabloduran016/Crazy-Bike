@@ -5,7 +5,7 @@ INITIAL_POSITION = {'backwheel': (80, 600),
 # INITIAL_POSITION = {'backwheel': (80, 600),
 #                     'frontwheel': (152, 654)}
 DIMENSIONS = (round(40), round(40))
-IMAGE = 'Assets/Images/wheel.png'
+IMAGE = 'Assets/Images/motorbikewheel.png'
 COLOR = RED
 RADIUS = 20
 WIDTH = 0

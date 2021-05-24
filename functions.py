@@ -1,4 +1,5 @@
 import pygame as pg
+from math import pi
 # import rsvgwrapper
 # import cairo
 # from PIL import Image
@@ -36,6 +37,9 @@ def blitrotate(image, pos, originpos, angle):
 
 def scale(img, zoom):
     return pg.transform.scale(img, (round(img.get_rect().width*zoom), round(img.get_rect().height*zoom)))
+
+def rad_to_degrees(angle):
+    return angle*180/pi
 
 
 '''def load_svg(file, size=None):

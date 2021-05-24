@@ -1,8 +1,9 @@
 import pygame
 import pymunk
+from pymunk import Vec2d as Vec
 from settings.WHEEL import *
+from functions import blitrotate, scale, rad_to_degrees
 # from functions import load_svg
-vec = pymunk.Vec2d
 
 
 class Wheel(pygame.sprite.Sprite):
@@ -22,7 +23,7 @@ class Wheel(pygame.sprite.Sprite):
         self.thetaacc = THETAACC
         # self.image = load_svg(IMAGE, size=DIMENSIONS).convert_alpha()
         self.image = pygame.image.load(IMAGE).convert_alpha()
-        self.initial_position = vec(*INITIAL_POSITION[self.id])
+        self.initial_position = Vec(*INITIAL_POSITION[self.id])
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
         self.body.position = INITIAL_POSITION[self.id]
         self.shape = pymunk.Circle(self.body, self.radius)
@@ -50,11 +51,11 @@ class Wheel(pygame.sprite.Sprite):
 
     def draw(self):
         # if not self.game.crushed:
-        im = pygame.transform.scale(self.image, (round(DIMENSIONS[0]*self.game.zoom),
-                                                   round(DIMENSIONS[1]*self.game.zoom)))
+        im = scale(self.image, self.game.zoom)
         rect = im.get_rect()
         rect.center = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
-        self.game.screen.blit(im, rect)
+        self.game.screen.blit(*blitrotate(im, Vec(*rect.center), Vec(rect.width/2, rect.height/2),
+                                          rad_to_degrees(-self.body.angle)))
         # pygame.draw.circle(self.game.screen, self.color, self.body.position-self.game.camera, self.radius, self.width)
 
     def reset(self):

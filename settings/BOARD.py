@@ -1,7 +1,7 @@
 from .colors import BLACK
 
 COLOR = BLACK
-IMAGE = 'Assets/Images/board98.png'
+IMAGE = 'Assets/Images/motorbikeboard.png'
 DENSITY = 0.1
 PIVOT = (5, 56)
 VERICES = ((-5, -1),
