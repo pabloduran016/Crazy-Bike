@@ -21,6 +21,8 @@ class Game:
         pg.init()
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.screen.blit(pg.image.load(STARTSCREEN.IMAGE), (0, 0))
+        pg.display.flip()
         pg.Surface.set_colorkey(self.screen, (255, 255, 255))
         pg.display.set_caption(TITLE)
         pg.display.set_icon(pg.image.load(ICON))
@@ -83,10 +85,10 @@ class Game:
         # Game Loop
         self.playing = True
         while self.playing:
-            self.clock.tick(FPS)
             self.events()
             self.draw()
             self.update()
+            self.clock.tick(FPS)
 
     def update(self):
         # Game Loop - Update
@@ -179,10 +181,10 @@ class Game:
             text=f"FLIPS      {self.flips}",
             fgcolor=BLACK,
             size=30)[0], self.f_rects[2])
-        # self.screen.blit(self.font.render(
-        #     text=f"ZOOM      {self.zoom:.2f}",
-        #     fgcolor=BLACK,
-        #     size=30)[0], self.f_rects[3])
+        self.screen.blit(self.font.render(
+            text=f"ZOOM      {self.zoom:.2f}",
+            fgcolor=BLACK,
+            size=30)[0], self.f_rects[3])
         self.screen.blit(self.font.render(
             text="Use    the    SPACE    BAR    to    accelerate    and    press    ESC    to    restart",
             fgcolor=BLACK,
@@ -199,7 +201,6 @@ class Game:
         self.coin_manager.coins = [Coin(self, vec(x, y), i - (COIN.IDLE_ANIM_SIZE - 1) *
                                         (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
         while self.waiting:
-            self.clock.tick(FPS)
             self.events()
             self.screen.fill(WHITE)
             self.start_screen.update()
@@ -207,6 +208,7 @@ class Game:
             self.start_screen.draw(self.screen)
             self.coin_manager.draw()
             pg.display.flip()
+            self.clock.tick(FPS)
         # print(self.mouse_coins)
         pass
 

@@ -1,6 +1,7 @@
 import pygame
 import pymunk
 from settings.WHEEL import *
+# from functions import load_svg
 vec = pymunk.Vec2d
 
 
@@ -19,9 +20,9 @@ class Wheel(pygame.sprite.Sprite):
         self.radius = RADIUS
         self.width = WIDTH
         self.thetaacc = THETAACC
-        self.image = pygame.transform.scale(pygame.image.load(IMAGE).convert_alpha(), DIMENSIONS)
+        # self.image = load_svg(IMAGE, size=DIMENSIONS).convert_alpha()
+        self.image = pygame.image.load(IMAGE).convert_alpha()
         self.initial_position = vec(*INITIAL_POSITION[self.id])
-
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
         self.body.position = INITIAL_POSITION[self.id]
         self.shape = pymunk.Circle(self.body, self.radius)

@@ -1,4 +1,8 @@
 import pygame as pg
+# import rsvgwrapper
+# import cairo
+# from PIL import Image
+# import numpy
 
 
 def blitrotate(image, pos, originpos, angle):
@@ -32,3 +36,26 @@ def blitrotate(image, pos, originpos, angle):
 
 def scale(img, zoom):
     return pg.transform.scale(img, (round(img.get_rect().width*zoom), round(img.get_rect().height*zoom)))
+
+
+'''def load_svg(file, size=None):
+    """Returns Pygame Image object from rasterized SVG
+    :param file: Path to the file
+    :param size: the image will be clipped to specified size.
+    """
+    data = memoryview(numpy.empty(size[0] * size[1] * 4, dtype=numpy.int8))
+    cairo_surface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_ARGB32, size[0], size[1], size[1] * 4)
+    svg_graphics = rsvgwrapper.rsvgHandle(file)
+    svg_graphics.render_cairo(cairo_surface)
+    data_string = bgra_surf_to_rgba_string(cairo_surface)
+    return pg.image.frombuffer(data_string, size, 'RGBA')
+
+
+def bgra_surf_to_rgba_string(cairo_surface):
+    # We use PIL to do this
+    img = Image.frombuffer(
+        'RGBA', (cairo_surface.get_width(),
+                 cairo_surface.get_height()),
+        cairo_surface.get_data(), 'raw', 'BGRA', 0, 1)
+
+    return img.tostring('raw', 'RGBA', 0, 1)'''

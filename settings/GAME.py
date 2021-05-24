@@ -5,7 +5,7 @@ FPS = 60
 WIDTH = 900
 HEIGHT = 900
 
-ZOOM = .75
+ZOOM = .6
 DISPLACEMENT = (150*(1-ZOOM), 700*(1-ZOOM))
 # World settings
 GRAVITY = (0, 0.5)
