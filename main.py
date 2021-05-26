@@ -10,7 +10,7 @@ from coinmanager import CoinManager
 from background import Background
 from foreground import Foreground
 from board import Board
-from coin import Coin
+from coin import Coin, SimpleCoin
 from sprite import SpriteGroup
 from screens import StartScreen, GoScreen
 from functions import scale
@@ -58,10 +58,13 @@ class Game:
         self._coins_collected = 0
         self._flips = 0
         self._points = 0
+        self.points_size = POINTS_SIZE
         self._pluspoints = 0
         self._pluspoints_counter = 0
+        self._distance = 0
         self.f_rects = []
         self.update_fonts()
+        self.simple_coin = SimpleCoin(self, self.f_rects[1].topleft)
         self.start_screen = StartScreen(self.font)
         self.go_screen = GoScreen(self.font, self.coins_collected, self.flips)
         self.textures = {'ground': pg.image.load(TEXTURES.GROUND).convert(),
@@ -78,8 +81,11 @@ class Game:
     @coins_collected.setter
     def coins_collected(self, value):
         self._coins_collected = value
-        self.f_rects[1] = self.font.get_rect(text=f"Coins Collected {self.coins_collected}", size=CC_SIZE)
+        # self.f_rects[1] = self.font.get_rect(text=f"Coins Collected {self.coins_collected}", size=CC_SIZE)
+        self.f_rects[1] = self.font.get_rect(text=f"{self.coins_collected}", size=CC_SIZE)
         self.f_rects[1].topright = CC_topright
+        self.simple_coin.rect.right = self.f_rects[1].left - 30
+        self.simple_coin.rect.centery = self.f_rects[1].centery
 
     @property
     def flips(self):
@@ -115,24 +121,38 @@ class Game:
 
     @property
     def points(self):
-        return self._points + self.board.body.position.x / 5000
+        return self._points
 
 
     @points.setter
     def points(self, value):
         self._points = value
-        self.f_rects[5] = self.font.get_rect(text=f"{self.points:.0f}", size=POINTS_SIZE)
+        self.points_size = POINTS_SIZE + POINTS_INCREASE
+        # print('increasing')
+        self.f_rects[5] = self.font.get_rect(text=f"{self.points:.0f}", size=self.points_size)
         self.f_rects[5].center = POINTS_center
+
+    @property
+    def distance(self):
+        return self._distance
+
+    @distance.setter
+    def distance(self, value):
+        if round(value - self._distance) >= 1:
+            # print('true')
+            self.points += round(value - self._distance)
+            self._distance = value
+
     @property
     def pluspoints(self):
-        if self.pluspoints_counter == 0:
-            self.points = self._pluspoints + self._points
+        if self.pluspoints_counter == 1:
+            self.points += self._pluspoints
             self._pluspoints = 0
         return self._pluspoints
 
     @pluspoints.setter
     def pluspoints(self, value):
-        if value != 0:
+        if value > 0:
             self.pluspoints_counter = 255
         self._pluspoints = value
         self.f_rects[6] = self.font.get_rect(text=f"+{self._pluspoints:.0f}", size=PLUSPOINTS_SIZE)
@@ -148,7 +168,13 @@ class Game:
 
     def new(self):
         # Start a new game
-        self._points = 0
+        self.points = 0
+        self.pluspoints = 0
+        self._pluspoints_counter = 0
+        self._distance = 0
+        self._zoom = ZOOM
+        self.flips = 0
+        self.points_size = POINTS_SIZE
         self.camera_shake = 0
         self.crushed = False
         self.space = pk.Space()  # Create Pymunk Space
@@ -160,7 +186,6 @@ class Game:
         self.zoom = ZOOM
         self.camera = Vec(0, 0)
         self.go_counter = 0
-        self.flips = 0
         self.all_sprites = SpriteGroup()
         self.backwheel = Wheel(self, 'backwheel')  # Create a Backwheel object add it to Pymunk Space
         self.frontwheel = Wheel(self, 'frontwheel')  # Create a Frontwheel object add it to Pymunk Space
@@ -169,9 +194,10 @@ class Game:
         self.coin_manager = CoinManager(self, period=8)
         self.background = Background(self)
         self.background = Background(self)
+        self.simple_coin = SimpleCoin(self, (self.f_rects[1].left, self.f_rects[1].centery))
         # TODO: create a cool foreground
         self.all_sprites.add(self.background, self.floors, self.coin_manager, self.backwheel, self.frontwheel,
-                             self.board)  # , self.foreground)
+                             self.board, self.simple_coin)  # , self.foreground)
         self.all_sprites.start()
         self.run()
 
@@ -194,6 +220,7 @@ class Game:
             self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
                             self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom) / 3
             # TODO: add smooth zooming when going at high speeds
+            self.distance = self.board.body.position.x / 5000
             pass
         elif self.go_counter < 100:
             # TODO: fix bugs on the death cam, it doesn´t put the bike on the centre
@@ -209,6 +236,9 @@ class Game:
             self.camera += Vec(randint(-SHAKE, SHAKE), randint(-SHAKE, SHAKE))
         if self.pluspoints_counter:
             self.pluspoints_counter -= 1
+            # print(self.pluspoints_counter)
+        if self.points_size > POINTS_SIZE:
+            self.points_size -= 1
         var.append(self.backwheel.body.velocity.y)
         var2.append(self.zoom)
         # var3.append(self.last_vel)
@@ -238,6 +268,7 @@ class Game:
             if event.type == pg.MOUSEBUTTONDOWN:
                 if pg.mouse.get_pressed(3)[0] and self.waiting:
                     self.waiting = False
+                print(pg.mouse.get_pos())
                     # self.mouse_coins.append(pg.mouse.get_pos())
         keys = pg.key.get_pressed()
         if not self.crushed:
@@ -269,18 +300,26 @@ class Game:
             text=f"fps {float(self.clock.get_fps().__str__()):.2f}",
             fgcolor=GREY,
             size=FPS_SIZE)[0], self.f_rects[0])
+        # self.screen.blit(self.font.render(
+        #     text=f"Coins Collected {self.coins_collected}",
+        #     fgcolor=BLACK,
+        #     size=CC_SIZE)[0], self.f_rects[1])
         self.screen.blit(self.font.render(
-            text=f"Coins Collected {self.coins_collected}",
+            text=f"{self.coins_collected}",
             fgcolor=BLACK,
             size=CC_SIZE)[0], self.f_rects[1])
-        self.screen.blit(self.font.render(
-            text=f"FLIPS {self.flips}",
-            fgcolor=BLACK,
-            size=FLIPS_SIZE)[0], self.f_rects[2])
-        self.screen.blit(self.font.render(
-            text=f"ZOOM {self.zoom*100:.0f}",
-            fgcolor=BLACK,
-            size=ZOOM_SIZE)[0], self.f_rects[3])
+        # self.screen.blit(self.font.render(
+        #     text=f"FLIPS {self.flips}",
+        #     fgcolor=BLACK,
+        #     size=FLIPS_SIZE)[0], self.f_rects[2])
+        # self.screen.blit(self.font.render(
+        #     text=f"DISTANCE {self.distance}",
+        #     fgcolor=BLACK,
+        #     size=FLIPS_SIZE)[0], (40, 40))
+        # self.screen.blit(self.font.render(
+        #     text=f"ZOOM {self.zoom*100:.0f}",
+        #     fgcolor=BLACK,
+        #     size=ZOOM_SIZE)[0], self.f_rects[3])
         self.screen.blit(self.font.render(
             text=f"Use the SPACE BAR to accelerate and press ESC to restart",
             fgcolor=BLACK,
@@ -288,7 +327,7 @@ class Game:
         self.screen.blit(self.font.render(
             text=f"{self.points:.0f}",
             fgcolor=BLACK,
-            size=POINTS_SIZE)[0], self.f_rects[5])
+            size=self.points_size)[0], self.f_rects[5])
         self.screen.blit(self.font.render(
             text=f"+{self.pluspoints:.0f}",
             fgcolor=[0, 0, 0, self.pluspoints_counter],
@@ -332,11 +371,11 @@ class Game:
     def update_fonts(self):
         self.f_rects = [
             self.font.get_rect(text=f"fps {float(self.clock.get_fps().__str__()):.2f}", size=FPS_SIZE),
-            self.font.get_rect(text=f"Coins Collected {self.coins_collected}", size=CC_SIZE),
+            self.font.get_rect(text=f"{self.coins_collected}", size=CC_SIZE),
             self.font.get_rect(text=f"FLIPS {self.flips}", size=FLIPS_SIZE),
             self.font.get_rect(text=f"ZOOM {self.zoom*100:.0f}", size=ZOOM_SIZE),
             self.font.get_rect(text=f"Use the SPACE BAR to accelerate and press ESC to restart", size=RULES_SIZE),
-            self.font.get_rect(text=f"{self.points:.0f}", size=POINTS_SIZE),
+            self.font.get_rect(text=f"{self.points:.0f}", size=self.points_size),
             self.font.get_rect(text=f"+{self._pluspoints:.0f}", size=PLUSPOINTS_SIZE),
         ]
         self.f_rects[0].topleft = FPS_topleft

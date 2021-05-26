@@ -35,3 +35,37 @@ class Coin:
 
     def draw(self):
         pass
+
+
+class SimpleCoin(pygame.sprite.Sprite):
+    def __init__(self, game, position, period=5):
+        """
+        :type game: main.Game
+        :type position: tuple
+        :type period: float
+        """
+        super().__init__()
+        self.game = game
+        self.images = [pygame.transform.scale(pygame.image.load(IDLE_ANIM + f'{x}.png'), (30, 30)).convert_alpha()
+                                 for x in range(IDLE_ANIM_SIZE)]
+        self.counter = 0
+        self.period = period
+        self.rect = pygame.Rect((0, 0, 30, 30))
+        self.rect.right = position[0] - 10
+        self.rect.centery = position[1]
+
+    def update(self):
+        self.counter += 1 / self.period
+        if round(self.counter) > IDLE_ANIM_SIZE - 1:
+            self.counter = 0
+
+    def draw(self):
+        if round(self.counter) > (IDLE_ANIM_SIZE - 1):
+            counter = round((self.counter) - (IDLE_ANIM_SIZE - 1) *
+                            ((self.counter) // (IDLE_ANIM_SIZE - 1)))
+        else:
+            counter = round(self.counter)
+        assert 0 <= counter <= IDLE_ANIM_SIZE - 1, \
+            f'Counter must be between 0 and {IDLE_ANIM_SIZE - 1}, was {counter}'
+        if not self.game.crushed:
+            self.game.screen.blit(self.images[int(self.counter)], self.rect)
