@@ -109,8 +109,9 @@ class Game:
         self.coin_manager = CoinManager(self, period=8)
         self.background = Background(self)
         self.background = Background(self)
+        # TODO: create a cool foreground
         self.all_sprites.add(self.background, self.floors, self.coin_manager, self.backwheel, self.frontwheel,
-                             self.board, self.foreground)
+                             self.board)  # , self.foreground)
         self.all_sprites.start()
         self.run()
 
@@ -135,7 +136,7 @@ class Game:
             # TODO: add smooth zooming when going at high speeds
             pass
         elif self.go_counter < 100:
-            # TODO: fix bugs on the death cam, it goes off randomnly
+            # TODO: fix bugs on the death cam, it doesn´t put the bike on the centre
             self.zoom += 0.003
             self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
                             self.board.body.position * self.zoom - self.scroll - Vec(450, 450) * self.zoom) / 20

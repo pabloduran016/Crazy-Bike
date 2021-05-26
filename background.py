@@ -1,5 +1,6 @@
 import pygame
 from settings.BACKGROUND import *
+from pymunk import Vec2d as Vec
 
 
 class Background(pygame.sprite.Sprite):
@@ -14,6 +15,7 @@ class Background(pygame.sprite.Sprite):
         self.rect = self.sky_image.get_rect()
         self.sky_multiplier = SKY_MULTIPLIER
         self.mountain_multiplier = MOUNTAIN_MULTIPLIER
+        self.mountain_intial_position = MOUNTAIN_INITIAL_POSITION
 
     def update(self):
         pass
@@ -31,5 +33,6 @@ class Background(pygame.sprite.Sprite):
         x = int(cam.x / self.rect.width)
         y = 0
         for disp in ((0, 0), (1, 0), (-1, 0)):
-            position = ((x + disp[0]) * self.rect.width, (y + disp[1]) * self.rect.height)
-            self.game.screen.blit(self.mountain_image, - cam + position)
+            position = Vec((x + disp[0]) * self.rect.width, (y + disp[1]) * self.rect.height) + \
+                       self.mountain_intial_position - cam
+            self.game.screen.blit(self.mountain_image, position)
