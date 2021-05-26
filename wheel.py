@@ -72,6 +72,8 @@ class Wheel(pygame.sprite.Sprite):
 
     def check_ground_begin(self, arbiter, space, data):
         self.game.board.checkground = 0
+        if not self.game.camera_shake and self.body.velocity.y > 15:
+            self.game.camera_shake = 8
         return True
 
     def check_ground_separate(self, arbiter, space, data):

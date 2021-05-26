@@ -14,6 +14,7 @@ from coin import Coin
 from sprite import SpriteGroup
 from screens import StartScreen, GoScreen
 from functions import scale
+from random import randint
 # import matplotlib.pylab as plt
 
 var = []
@@ -50,7 +51,9 @@ class Game:
         self.all_sprites = SpriteGroup()
         self._crushed = False
         self.camera = Vec(0, 0)
+        self.camera_shake = 0
         self.camera_focus = Vec(*CAMERA_INITIAL_POSITION)
+        self.scroll = Vec(0, 0)
         self.font = pg_ft.Font(ARCADECLASSIC)
         self.coins_collected = 0
         self.flips = 0
@@ -86,10 +89,12 @@ class Game:
 
     def new(self):
         # Start a new game
+        self.camera_shake = 0
         self.crushed = False
         self.space = pk.Space()  # Create Pymunk Space
         self.space.gravity = GRAVITY  # Establish Gravity in Pymunk Space
         self.camera_focus = Vec(*CAMERA_INITIAL_POSITION)
+        self.scroll = Vec(0, 0)
         self.camera = Vec(0, 0)
         self.coins_collected = 0
         self.zoom = ZOOM
@@ -125,18 +130,22 @@ class Game:
         self.space.step(0.5)
         self.all_sprites.update()
         if not self.crushed:
-            self.camera += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
-                            self.board.body.position * self.zoom - self.camera - self.camera_focus * self.zoom) / 3
+            self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
+                            self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom) / 3
             # TODO: add smooth zooming when going at high speeds
             pass
         elif self.go_counter < 100:
-            # TODO: fix bugs on the death cam
+            # TODO: fix bugs on the death cam, it goes off randomnly
             self.zoom += 0.003
-            self.camera += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
-                            self.board.body.position * self.zoom - self.camera - Vec(450, 450) * self.zoom) / 20
+            self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
+                            self.board.body.position * self.zoom - self.scroll - Vec(450, 450) * self.zoom) / 20
             self.go_counter += 1
         else:
             self.playing = False
+        self.camera = Vec(*self.scroll)
+        if self.camera_shake:
+            self.camera_shake -= 1
+            self.camera += Vec(randint(-2, 2), randint(-2, 2))
         var.append(self.backwheel.body.velocity.y)
         var2.append(self.zoom)
         # var3.append(self.last_vel)
@@ -179,7 +188,8 @@ class Game:
             else:
                 self.board.checkground = max(1, self.board.checkground - 1)
         if keys[pg.K_d]:
-            self.camera += Vec(40, 0)
+            # self.camera += Vec(40, 0)
+            self.camera_shake = 8
         if keys[pg.K_a]:
             self.camera += Vec(-40, 0)
         if keys[pg.K_w]:
@@ -206,7 +216,7 @@ class Game:
             fgcolor=BLACK,
             size=30)[0], self.f_rects[2])
         self.screen.blit(self.font.render(
-            text=f"ZOOM      {self.zoom:.2f}",
+            text=f"ZOOM      {self.zoom*100:.0f}",
             fgcolor=BLACK,
             size=30)[0], self.f_rects[3])
         self.screen.blit(self.font.render(
@@ -254,7 +264,7 @@ class Game:
             self.font.get_rect(text=f"fps       " + str(self.clock.get_fps().__str__()), size=30),
             self.font.get_rect(text=f"Coins Collected      {self.coins_collected}", size=30),
             self.font.get_rect(text=f"FLIPS      {self.flips}", size=30),
-            self.font.get_rect(text=f"ZOOM      {self.zoom:.2f}", size=30),
+            self.font.get_rect(text=f"ZOOM      {self.zoom*100:.0f}", size=30),
             self.font.get_rect(text=f"Use    the    SPACE    BAR    to    accelerate    and    press    ESC    to    "
                                     f"restart", size=25),
         ]

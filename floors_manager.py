@@ -45,9 +45,9 @@ class FloorsManager(pygame.sprite.Sprite):
                                      final_pos=lastfloor.lastpoint + vec(le, h), width=WIDTH))
             elif selection == 2:  # PARABOLA
                 if len(self.all) > 2:
-                    h = randint(-800, 400)
+                    h = randint(-400, 800)
                     if h + self.all[-2].lastpoint.y > INITIALPOS[1]:  # If you go down, do you reach de bottom?
-                        h = randint(-800, 0)
+                        h = randint(-400, 0)
                         self.all.append(Parabola(game=self.game, position=lastfloor.lastpoint, length=le, height=h,
                                                  width=WIDTH, up=True))
                     else:
@@ -60,7 +60,7 @@ class FloorsManager(pygame.sprite.Sprite):
 
                 else:
                     # print('h')
-                    h = randint(-800, 0)
+                    h = randint(-400, 0)
                     self.all.append(Parabola(game=self.game, position=lastfloor.lastpoint, length=le, height=h,
                                              width=WIDTH, up=True))
             self.game.coin_manager.generate(self.all[-1])

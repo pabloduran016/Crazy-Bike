@@ -83,4 +83,6 @@ class Board(pygame.sprite.Sprite):
     def check_ground_begin(self, arbiter, space, data):
         if not self.game.crushed:
             self.game.crushed = True
+            if not self.game.camera_shake:
+                self.game.camera_shake = 10
         return True
