@@ -1,4 +1,3 @@
-from .GAME import ZOOM
 IDLE_ANIM = 'Assets/Animations/Idle_Coin_anim/'
 IDLE_ANIM_SIZE = 24
 COLLECTED_ANIM = 'Assets/Animations/Collected_Coin_anim/'
@@ -17,8 +16,8 @@ SS_POSITIONS = [
     (716, 620),
     (782, 595),
     (841, 577)]
-DIMENSIONS = (round(38*ZOOM), round(38*ZOOM))
-DISTANCE = 30*ZOOM
-WIDHT = 50*ZOOM
-SPACING = 100*ZOOM
+DIMENSIONS = (round(38), round(38))
+DISTANCE = 30
+WIDHT = 50
+SPACING = 100
 MASS = 1
