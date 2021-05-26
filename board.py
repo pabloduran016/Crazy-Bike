@@ -61,7 +61,7 @@ class Board(pygame.sprite.Sprite):
             for con in dic:
                 self.game.space.remove(con)
             im, pos = blitrotate(self.image, self.body.position - self.game.camera, self.pivot, self.angle)
-            self.game.screen.blit(im, pos)
+            # self.game.screen.blit(im, pos)
             self.game.space.gravity = (0, 0)
             self.body.velocity = (0, 0)
             self.body.angular_velocity = 0

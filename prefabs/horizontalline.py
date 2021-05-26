@@ -28,7 +28,7 @@ class HorizontalLine(Floor):
         self.eq = lambda x: 0
 
     def draw(self):
-        offset = self.body.position*self.game.zoom - self.game.camera
+        offset = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
         for group, tex in ((self.vertices, 'ground'), (self.grass, 'grass')):
             points = [(p + self.body.position) * self.game.zoom - self.game.camera + self.game.displacement
                       for p in group]

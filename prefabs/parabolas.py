@@ -38,7 +38,7 @@ class Parabola(Floor):
             self.eq = lambda x: self.a * ((x - self.length) ** 2) + self.height
 
     def draw(self):
-        offset = self.body.position*self.game.zoom - self.game.camera
+        offset = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
         for group, tex in ((self.points, 'ground'), (self.grass, 'grass')):
             points = [(p + self.body.position)*self.game.zoom - self.game.camera + self.game.displacement
                       for p in group]

@@ -31,7 +31,7 @@ class Line(Floor):
         self.eq = lambda p: self.slope*p
 
     def draw(self):
-        offset = self.body.position * self.game.zoom - self.game.camera
+        offset = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
         for group, tex in ((self.vertices, 'ground'), (self.grass, 'grass')):
             points = [(p + self.body.position) * self.game.zoom - self.game.camera + self.game.displacement
                       for p in group]

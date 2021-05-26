@@ -1,5 +1,6 @@
 import pygame as pg
 from math import pi, exp
+from pymunk import Vec2d as Vec
 # import rsvgwrapper
 # import cairo
 # from PIL import Image
@@ -27,7 +28,7 @@ def blitrotate(image, pos, originpos, angle):
     pivot_move = pivot_rotate - pivot
 
     # calculate the upper left origin of the rotated sky_image
-    origin = (pos.x - originpos.x + min_box[0] - pivot_move[0], pos.y - originpos.y - max_box[1] + pivot_move[1])
+    origin = Vec(pos.x - originpos.x + min_box[0] - pivot_move[0], pos.y - originpos.y - max_box[1] + pivot_move[1])
 
     # get parab_a rotated sky_image
     rotated_image = pg.transform.rotate(image, angle)
@@ -45,7 +46,7 @@ def rad_to_degrees(angle):
 
 
 def normalize(x):
-    return 1 / (1 + exp(-.2*x + 5))
+    return 1 / (1 + exp(-x + 5))
 
 
 '''def load_svg(file, size=None):

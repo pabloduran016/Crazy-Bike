@@ -13,14 +13,12 @@ from board import Board
 from coin import Coin
 from sprite import SpriteGroup
 from screens import StartScreen, GoScreen
-
-
-# from functions import normalize
+from functions import scale
 # import matplotlib.pylab as plt
 
-# var = []
-# var2 = []
-# var3 = []
+var = []
+var2 = []
+var3 = []
 
 
 class Game:
@@ -74,6 +72,8 @@ class Game:
     @crushed.setter
     def crushed(self, value):
         self._crushed = value
+        # if value is True:
+        #     self.camera_focus = self.board.body.position
 
     @property
     def zoom(self):
@@ -114,8 +114,6 @@ class Game:
         self.playing = True
         while self.playing:
             # if self.clock.get_time() % 4 == 0:
-            # var.append(abs(self.backwheel.body.velocity))
-            # var2.append(abs(self.zoom))
             self.events()
             self.draw()
             self.update()
@@ -127,22 +125,21 @@ class Game:
         self.space.step(0.5)
         self.all_sprites.update()
         if not self.crushed:
-            self.camera += (pg.transform.scale(self.board.image,
-                                               (round(BOARD.DIMENSIONS[0] * self.zoom),
-                                                round(BOARD.DIMENSIONS[1] * self.zoom))).get_rect().center +
+            self.camera += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
                             self.board.body.position * self.zoom - self.camera - self.camera_focus * self.zoom) / 3
-            # TODO: fix the zooming so that it is smooth and there is not sudden changes
-            # self.zoom += (ZOOM - normalize(self.backwheel.body.velocity.length) * ZOOM_VARIABILITY - self.zoom) / 10
-            # var3.append(normalize(self.backwheel.body.velocity.length) * ZOOM_VARIABILITY)
-            # normalize makes the argument be between 0 and 1
+            # TODO: add smooth zooming when going at high speeds
             pass
-        elif self.go_counter < 50:
-            # self.camera += (-10, 0)
+        elif self.go_counter < 100:
+            # TODO: fix bugs on the death cam
+            self.zoom += 0.003
+            self.camera += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
+                            self.board.body.position * self.zoom - self.camera - Vec(450, 450) * self.zoom) / 20
             self.go_counter += 1
-            self.zoom += 0.001
-            # self.displacement = (self.board.body.position*self.zoom - self.camera) * (1 - self.zoom)
         else:
             self.playing = False
+        var.append(self.backwheel.body.velocity.y)
+        var2.append(self.zoom)
+        # var3.append(self.last_vel)
         self.update_fonts()
 
     def events(self):
@@ -172,14 +169,15 @@ class Game:
                     self.waiting = False
                     # self.mouse_coins.append(pg.mouse.get_pos())
         keys = pg.key.get_pressed()
-        if keys[pg.K_SPACE] or pg.mouse.get_pressed(3)[0]:
-            self.backwheel.body.angular_velocity += self.backwheel.thetaacc
-            if self.board.checkground > 0:
-                self.board.checkground += 1
-                if self.board.checkground > 10:
-                    self.board.body.angular_velocity -= self.board.thetaacc
-        else:
-            self.board.checkground = max(1, self.board.checkground - 1)
+        if not self.crushed:
+            if keys[pg.K_SPACE] or pg.mouse.get_pressed(3)[0]:
+                self.backwheel.body.angular_velocity += self.backwheel.thetaacc
+                if self.board.checkground > 0:
+                    self.board.checkground += 1
+                    if self.board.checkground > 10:
+                        self.board.body.angular_velocity -= self.board.thetaacc
+            else:
+                self.board.checkground = max(1, self.board.checkground - 1)
         if keys[pg.K_d]:
             self.camera += Vec(40, 0)
         if keys[pg.K_a]:
@@ -288,9 +286,12 @@ if __name__ == '__main__':
         g.show_go_screen()
 
     pg.quit()
-    #
+
     # fig, ax = plt.subplots(3, 1)
     # ax[0].plot(var)
+    # ax[0].set_title('velocity')
     # ax[1].plot(var2)
+    # ax[1].set_title('zoom')
+    # ax[2].set_title('deltavel')
     # ax[2].plot(var3)
     # plt.show()
