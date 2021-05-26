@@ -17,10 +17,4 @@ DEBUG = False
 # DEBUG = True
 CAMERA_INITIAL_POSITION = (150, 700)
 
-# Fonts
-ARCADECLASSIC = 'Assets/Fonts/ARCADECLASSIC.TTF'
-F1_topleft = 20, 20
-F2_topright = 880, 20
-F3_topright = 880, 50
-F4_topright = 880, 80
-F5_bottomleft = 20, 880
+SHAKE = 4

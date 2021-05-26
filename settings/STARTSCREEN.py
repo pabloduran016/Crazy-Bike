@@ -1,4 +1,6 @@
 IMAGE = 'Assets/Images/startscreen2.png'
 ANIMATION_SIZE = 2
-F1_center = 450, 200
-F2_center = 450, 800
+CB_center = 450, 200
+CB_SIZE = 70
+SPACE_center = 450, 800
+SPACE_SIZE = 20

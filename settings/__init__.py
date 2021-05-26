@@ -1,5 +1,6 @@
 from .colors import *
 from .GAME import *
+from .FONTS import *
 import settings.BACKGROUND
 import settings.BOARD
 import settings.COIN

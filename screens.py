@@ -1,4 +1,5 @@
 from settings import STARTSCREEN, GOSCREEN, BLACK, WHITE
+from settings.FONTS import *
 from pygame.image import load
 
 
@@ -8,12 +9,12 @@ class StartScreen:
         self.count = -.5
         self.font = font
 
-        self.f1_rect = font.get_rect(text=f"CRAZY    BIKE", size=100)
-        self.f1_rect.center = STARTSCREEN.F1_center
+        self.f1_rect = font.get_rect(text=f"CRAZY BIKE", size=STARTSCREEN.CB_SIZE)
+        self.f1_rect.center = STARTSCREEN.CB_center
 
-        self.f2_rect = font.get_rect(text="Press    the    SPACE    BAR    or    right    click    to    continue",
-                                     size=30)
-        self.f2_rect.center = STARTSCREEN.F2_center
+        self.f2_rect = font.get_rect(text="Press the SPACE BAR or right click to continue",
+                                     size=STARTSCREEN.SPACE_SIZE)
+        self.f2_rect.center = STARTSCREEN.SPACE_center
 
     def update(self):
         self.count += 1/20
@@ -25,13 +26,13 @@ class StartScreen:
     def draw(self, screen):
         screen.blit(self.image, (0, 0))
         screen.blit(self.font.render(
-            text=f"CRAZY    BIKE",
+            text=f"CRAZY BIKE",
             fgcolor=BLACK if round(self.count) == 0 else WHITE,
-            size=100)[0], self.f1_rect.topleft)
+            size=STARTSCREEN.CB_SIZE)[0], self.f1_rect.topleft)
         screen.blit(self.font.render(
-            text=f"Press    the    SPACE    BAR    or    right    click    to    continue",
+            text="Press the SPACE BAR or right click to continue",
             fgcolor=BLACK if round(self.count) == 0 else WHITE,
-            size=30)[0], self.f2_rect.topleft)
+            size=STARTSCREEN.SPACE_SIZE)[0], self.f2_rect.topleft)
 
 
 class GoScreen:
@@ -42,15 +43,15 @@ class GoScreen:
         self.flips = flips
         self.f_color = BLACK
         self.f_rects = [
-            font.get_rect(text=f"GAME    OVER", size=100),
-            font.get_rect(text=f"Coins Collected      {self.coins_collected}", size=30),
-            font.get_rect(text=f"FLIPS      {self.flips}", size=30),
-            font.get_rect(text=f"PRESS    SPACE    TO    CONTINUE", size=60)
+            font.get_rect(text=f"GAME OVER", size=GOSCREEN.GO_SIZE),
+            font.get_rect(text=f"Coins Collected {self.coins_collected}", size=CC_SIZE),
+            font.get_rect(text=f"FLIPS {self.flips}", size=FLIPS_SIZE),
+            font.get_rect(text=f"PRESS SPACE TO CONTINUE", size=GOSCREEN.SPACE_SIZE)
         ]
-        self.f_rects[0].center = GOSCREEN.F1_center
-        self.f_rects[1].topright = GOSCREEN.F2_topright
-        self.f_rects[2].topright = GOSCREEN.F3_topright
-        self.f_rects[3].center = GOSCREEN.F4_center
+        self.f_rects[0].center = GOSCREEN.GO_center
+        self.f_rects[1].topright = CC_topright
+        self.f_rects[2].topright = FLIPS_topright
+        self.f_rects[3].center = GOSCREEN.SPACE_center
 
     def update(self):
         self.count += 1/20
@@ -60,18 +61,18 @@ class GoScreen:
 
     def draw(self, screen):
         screen.blit(self.font.render(
-            text=f"GAME    OVER",
+            text=f"GAME OVER",
             fgcolor=BLACK if round(self.count) == 0 else WHITE,
-            size=100)[0], self.f_rects[0].topleft)
+            size=GOSCREEN.GO_SIZE)[0], self.f_rects[0].topleft)
         screen.blit(self.font.render(
-            text=f"Coins Collected      {self.coins_collected}",
+            text=f"Coins Collected {self.coins_collected}",
             fgcolor=BLACK,
-            size=30)[0], self.f_rects[1].topleft)
+            size=CC_SIZE)[0], self.f_rects[1].topleft)
         screen.blit(self.font.render(
-            text=f"FLIPS      {self.flips}",
+            text=f"FLIPS {self.flips}",
             fgcolor=BLACK,
-            size=30)[0], self.f_rects[2].topleft)
+            size=FLIPS_SIZE)[0], self.f_rects[2].topleft)
         screen.blit(self.font.render(
-            text="PRESS    SPACE    TO    CONTINUE",
+            text="PRESS SPACE TO CONTINUE",
             fgcolor=BLACK if round(self.count) == 0 else WHITE,
-            size=60)[0], self.f_rects[3].topleft)
+            size=GOSCREEN.SPACE_SIZE)[0], self.f_rects[3].topleft)
