@@ -13,7 +13,7 @@ class Coin:
         self.game = game
         assert 0 <= phase <= IDLE_ANIM_SIZE - 1, f'phase should be between 0 and COIN.ANIMATION_SIZE - 1; was {phase}'
         self.phase = phase
-        self.rect = pygame.image.load(IDLE_ANIM + '0.png').get_rect()
+        self.rect = pygame.Rect((0, 0, DIMENSIONS[0], DIMENSIONS[1]))
         self.rect.center = self.position
         self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
         self.body.position = position
@@ -38,7 +38,7 @@ class Coin:
 
 
 class SimpleCoin(pygame.sprite.Sprite):
-    def __init__(self, game, position, period=5):
+    def __init__(self, game, position, period=2):
         """
         :type game: main.Game
         :type position: tuple
@@ -46,11 +46,12 @@ class SimpleCoin(pygame.sprite.Sprite):
         """
         super().__init__()
         self.game = game
-        self.images = [pygame.transform.scale(pygame.image.load(IDLE_ANIM + f'{x}.png'), (30, 30)).convert_alpha()
-                                 for x in range(IDLE_ANIM_SIZE)]
+        self.images = [pygame.transform.scale(
+            pygame.image.load(IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png').convert_alpha(), DIMENSIONS)
+                            for x in range(IDLE_ANIM_SIZE)]
         self.counter = 0
         self.period = period
-        self.rect = pygame.Rect((0, 0, 30, 30))
+        self.rect = pygame.Rect((0, 0, DIMENSIONS[0], DIMENSIONS[1]))
         self.rect.right = position[0] - 10
         self.rect.centery = position[1]
 

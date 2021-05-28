@@ -15,6 +15,12 @@ class SpriteGroup(pygame.sprite.Group):
             if hasattr(obj, 'start'):
                 obj.start()
 
+    def reset(self):
+        for obj in self.sprites():
+            if hasattr(obj, 'reset'):
+                obj.reset()
+        self.start()
+
     def apply_zoom(self, zoom):
         for obj in self.sprites():
             if hasattr(obj, 'apply_zoom'):

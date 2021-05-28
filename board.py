@@ -46,7 +46,30 @@ class Board(pygame.sprite.Sprite):
         self.handler.begin = self.check_ground_begin
         self.flipped = False
 
+    def reset(self):
+        self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(vec(1, 0))
+        self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
+        self.body.position = self.body_a.body.position
+        self.shape = pymunk.Poly(self.body, VERICES)
+        self.shape.density = DENSITY
+        self.shape.friction = FRICTION
+        self.shape.color = self.color
+        self.shape.elasticity = ELASTICITY
+        self.shape.collision_type = 2
+        self.shape.filter = pymunk.ShapeFilter(group=2)
+        self.game.space.add(self.body, self.shape)
+        self.joint1 = pivotjoint(self.body, self.body_a.body)
+        self.joint1.collide_bodies = False
+        self.joint2 = pivotjoint(self.body, self.body_b.body, a=self.body_b.body.position - self.body.position)
+        self.joint2.collide_bodies = False
+        self.game.space.add(self.joint1, self.joint2)
+        self.checkground = 1
+        self.handler = self.game.space.add_collision_handler(2, 3)
+        self.handler.begin = self.check_ground_begin
+        self.flipped = False
+
     def update(self):
+        dic = self.game.space._constraints.copy()
         if not self.game.crushed:
             self.body.angular_velocity *= AIR_DRAG_MULTIPLIER
             self.angle = round((self.body_b.body.position -
@@ -60,7 +83,7 @@ class Board(pygame.sprite.Sprite):
             dic = self.game.space._constraints.copy()
             for con in dic:
                 self.game.space.remove(con)
-            im, pos = blitrotate(self.image, self.body.position - self.game.camera, self.pivot, self.angle)
+            # im, pos = blitrotate(self.image, self.body.position - self.game.camera, self.pivot, self.angle)
             # self.game.screen.blit(im, pos)
             self.game.space.gravity = (0, 0)
             self.body.velocity = (0, 0)
@@ -73,12 +96,6 @@ class Board(pygame.sprite.Sprite):
                              self.pivot*self.game.zoom, self.angle)
         # print(im.get_size())
         self.game.screen.blit(im, pos)
-
-    def reset(self):
-        self.body.velocity = (0, 0)
-        self.body.angular_velocity = 0
-        self.angle = 0
-        self.body.position = self.body_a.body.position
 
     def check_ground_begin(self, arbiter, space, data):
         if not self.game.crushed:

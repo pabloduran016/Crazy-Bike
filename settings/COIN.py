@@ -1,5 +1,8 @@
-IDLE_ANIM = 'Assets/Animations/Idle_Coin_anim/'
-IDLE_ANIM_SIZE = 24
+# IDLE_ANIM = 'Assets/Animations/Idle_Coin_anim/'
+# IDLE_ANIM_SIZE = 24
+IDLE_ANIM = 'Assets/Animations/Coin_anim_3/'
+IDLE_ANIM_SIZE = 60
+IDLE_OFFSET = 1
 COLLECTED_ANIM = 'Assets/Animations/Collected_Coin_anim/'
 COLLECTED_ANIM_SIZE = 19
 SS_POSITIONS = [

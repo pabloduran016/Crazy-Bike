@@ -15,7 +15,7 @@ from sprite import SpriteGroup
 from screens import StartScreen, GoScreen
 from functions import scale
 from random import randint
-# import matplotlib.pylab as plt
+import matplotlib.pylab as plt
 
 var = []
 var2 = []
@@ -28,7 +28,8 @@ class Game:
         pg.init()
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-        self.screen.blit(pg.image.load(STARTSCREEN.IMAGE), (0, 0))
+        self.loading_screen = pg.image.load(LOADING_IMAGE)
+        self.screen.blit(self.loading_screen, (0, 0))
         pg.display.flip()
         pg.Surface.set_colorkey(self.screen, (255, 255, 255))
         pg.display.set_caption(TITLE)
@@ -39,22 +40,6 @@ class Game:
         self.running = True
         self.waiting = True
         self._zoom = ZOOM
-        self.displacement = DISPLACEMENT
-        self.space = pk.Space()
-        self.backwheel = Wheel(self, 'backwheel')
-        self.frontwheel = Wheel(self, 'backwheel')
-        self.board = Board(self, self.backwheel, self.frontwheel)
-        self.floors = FloorsManager(self)
-        self.coin_manager = CoinManager(self, 8)
-        self.background = Background(self)
-        self.foreground = Foreground(self)
-        self.all_sprites = SpriteGroup()
-        self._crushed = False
-        self.camera = Vec(0, 0)
-        self.camera_shake = 0
-        self.camera_focus = Vec(*CAMERA_INITIAL_POSITION)
-        self.scroll = Vec(0, 0)
-        self.font = pg_ft.Font(JOYSTIX)
         self._coins_collected = 0
         self._flips = 0
         self._points = 0
@@ -62,9 +47,29 @@ class Game:
         self._pluspoints = 0
         self._pluspoints_counter = 0
         self._distance = 0
+        self._airtime = 0
+        self.displacement = DISPLACEMENT
+        self.space = pk.Space()
+        self.backwheel = Wheel(self, 'backwheel')
+        self.frontwheel = Wheel(self, 'frontwheel')
+        self.board = Board(self, self.backwheel, self.frontwheel)
+        self.floors = FloorsManager(self)
+        self.coin_manager = CoinManager(self, period=1.5)
+        self.background = Background(self)
+        self.font = pg_ft.Font(JOYSTIX)
         self.f_rects = []
-        self.update_fonts()
+        self.start_fonts()
         self.simple_coin = SimpleCoin(self, self.f_rects[1].topleft)
+        # self.foreground = Foreground(self)
+        self.all_sprites = SpriteGroup()
+        self.all_sprites.add(self.background, self.floors, self.coin_manager, self.simple_coin, self.backwheel,
+                             self.frontwheel, self.board)  # ,self.foreground)
+        self._crushed = False
+        self.camera = Vec(0, 0)
+        self.camera_shake = 0
+        self.camera_focus = Vec(*CAMERA_INITIAL_POSITION)
+        self.scroll = Vec(0, 0)
+        self.delta_zoom = 0
         self.start_screen = StartScreen(self.font)
         self.go_screen = GoScreen(self.font, self.coins_collected, self.flips)
         self.textures = {'ground': pg.image.load(TEXTURES.GROUND).convert(),
@@ -115,7 +120,7 @@ class Game:
     @zoom.setter
     def zoom(self, value):
         self._zoom = value
-        self.displacement = self.camera_focus * (1 - self.zoom)
+        self.displacement = self.camera_focus * (1 - self._zoom)
         self.f_rects[3] = self.font.get_rect(text=f"ZOOM {self.zoom*100:.0f}", size=ZOOM_SIZE)
         self.f_rects[3].topright = ZOOM_topright
 
@@ -127,7 +132,8 @@ class Game:
     @points.setter
     def points(self, value):
         self._points = value
-        self.points_size = POINTS_SIZE + POINTS_INCREASE
+        if not self.crushed:
+            self.points_size = POINTS_SIZE + POINTS_INCREASE
         # print('increasing')
         self.f_rects[5] = self.font.get_rect(text=f"{self.points:.0f}", size=self.points_size)
         self.f_rects[5].center = POINTS_center
@@ -145,7 +151,7 @@ class Game:
 
     @property
     def pluspoints(self):
-        if self.pluspoints_counter == 1:
+        if self.pluspoints_counter == 1 or self.crushed:
             self.points += self._pluspoints
             self._pluspoints = 0
         return self._pluspoints
@@ -166,39 +172,45 @@ class Game:
     def pluspoints_counter(self, value):
         self._pluspoints_counter = value
 
+    @property
+    def airtime(self):
+        return self._airtime
+
+    @airtime.setter
+    def airtime(self, value):
+        self._airtime = value
+        self.f_rects[7] = self.font.get_rect(text=f"Air Time {self._airtime}", size=AT_SIZE)
+        self.f_rects[7].topright = AT_topright
+
     def new(self):
         # Start a new game
-        self.points = 0
-        self.pluspoints = 0
-        self._pluspoints_counter = 0
-        self._distance = 0
-        self._zoom = ZOOM
-        self.flips = 0
+        self.delta_zoom =  self.airtime = self.points = self.pluspoints = self._pluspoints_counter = self._distance = \
+            self.flips = self.coins_collected = self.camera_shake = self.go_counter = 0
+        self.zoom = ZOOM
         self.points_size = POINTS_SIZE
-        self.camera_shake = 0
         self.crushed = False
         self.space = pk.Space()  # Create Pymunk Space
         self.space.gravity = GRAVITY  # Establish Gravity in Pymunk Space
-        self.camera_focus = Vec(*CAMERA_INITIAL_POSITION)
+        # self.camera_focus = Vec(*CAMERA_INITIAL_POSITION)
         self.scroll = Vec(0, 0)
         self.camera = Vec(0, 0)
-        self.coins_collected = 0
-        self.zoom = ZOOM
         self.camera = Vec(0, 0)
-        self.go_counter = 0
-        self.all_sprites = SpriteGroup()
-        self.backwheel = Wheel(self, 'backwheel')  # Create a Backwheel object add it to Pymunk Space
-        self.frontwheel = Wheel(self, 'frontwheel')  # Create a Frontwheel object add it to Pymunk Space
-        self.board = Board(self, self.backwheel, self.frontwheel)  # Create Board and connect both wheels
-        self.floors = FloorsManager(self)
-        self.coin_manager = CoinManager(self, period=8)
-        self.background = Background(self)
-        self.background = Background(self)
-        self.simple_coin = SimpleCoin(self, (self.f_rects[1].left, self.f_rects[1].centery))
+        # self.backwheel = Wheel(self, 'backwheel')
+        # self.frontwheel = Wheel(self, 'frontwheel')
+        # self.board = Board(self, self.backwheel, self.frontwheel)
+        self.all_sprites.remove(self.coin_manager)
+        # self.floors = FloorsManager(self)
+        # self.coin_manager = CoinManager(self, period=1.5)
+        # self.all_sprites.add(self.coin_manager)
+        # self.background = Background(self)
+        # self.simple_coin = SimpleCoin(self, self.f_rects[1].topleft)
+        self.foreground = Foreground(self)
+        # self.all_sprites = SpriteGroup()
+        # self.all_sprites.add(self.background, self.floors, self.coin_manager, self.simple_coin, self.backwheel,
+        #                      self.frontwheel, self.board)  # ,self.foreground)
+        # self.all_sprites.start()
+        self.all_sprites.reset()
         # TODO: create a cool foreground
-        self.all_sprites.add(self.background, self.floors, self.coin_manager, self.backwheel, self.frontwheel,
-                             self.board, self.simple_coin)  # , self.foreground)
-        self.all_sprites.start()
         self.run()
 
     def run(self):
@@ -213,6 +225,10 @@ class Game:
 
     def update(self):
         # Game Loop - Update
+        # print(self.airtime)
+        # print(self.crushed)
+        if self.airtime:
+            self.airtime += 1
         self.space.step(0.5)
         self.space.step(0.5)
         self.all_sprites.update()
@@ -220,6 +236,15 @@ class Game:
             self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
                             self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom) / 3
             # TODO: add smooth zooming when going at high speeds
+            if ZOOM_MIN < self.zoom + self.delta_zoom < ZOOM:
+                self.zoom += self.delta_zoom
+            self.delta_zoom += -0.002 if self.board.checkground > 10 else +0.002
+            # print(abs(self.board.checkground))
+            # if self.airtime > 60:
+            #     self.zoom = max(self.zoom - ZOOM_DECAY, ZOOM_MIN)
+            # else:
+                # print('out')
+                # self.zoom = min(self.zoom + (ZOOM_INCREASE), ZOOM)
             self.distance = self.board.body.position.x / 5000
             pass
         elif self.go_counter < 100:
@@ -258,17 +283,15 @@ class Game:
                 if event.key == pg.K_SPACE and self.waiting:
                     self.waiting = False
                 if event.key == pg.K_r:
-                    self.backwheel.reset()
-                    self.frontwheel.reset()
-                    self.board.reset()
-                if event.key == pg.K_UP:
-                    self.zoom += 0.005
-                if event.key == pg.K_DOWN:
-                    self.zoom -= 0.005
+                    pass
+                # if event.key == pg.K_UP:
+                #     self.zoom += 0.005
+                # if event.key == pg.K_DOWN:
+                #     self.zoom -= 0.005
             if event.type == pg.MOUSEBUTTONDOWN:
                 if pg.mouse.get_pressed(3)[0] and self.waiting:
                     self.waiting = False
-                print(pg.mouse.get_pos())
+                # print(pg.mouse.get_pos())
                     # self.mouse_coins.append(pg.mouse.get_pos())
         keys = pg.key.get_pressed()
         if not self.crushed:
@@ -289,6 +312,10 @@ class Game:
             self.camera += Vec(0, -40)
         if keys[pg.K_s]:
             self.camera += Vec(0, 40)
+        if keys[pg.K_UP]:
+            self.zoom += 0.005
+        if keys[pg.K_DOWN]:
+            self.zoom -= 0.005
 
     def draw(self):
         self.screen.fill(WHITE)
@@ -312,14 +339,18 @@ class Game:
         #     text=f"FLIPS {self.flips}",
         #     fgcolor=BLACK,
         #     size=FLIPS_SIZE)[0], self.f_rects[2])
+        self.screen.blit(self.font.render(
+            text=f"Air Time {self.airtime}",
+            fgcolor=BLACK,
+            size=AT_SIZE)[0], self.f_rects[7])
         # self.screen.blit(self.font.render(
         #     text=f"DISTANCE {self.distance}",
         #     fgcolor=BLACK,
         #     size=FLIPS_SIZE)[0], (40, 40))
-        # self.screen.blit(self.font.render(
-        #     text=f"ZOOM {self.zoom*100:.0f}",
-        #     fgcolor=BLACK,
-        #     size=ZOOM_SIZE)[0], self.f_rects[3])
+        self.screen.blit(self.font.render(
+            text=f"ZOOM {self.zoom*100:.0f}",
+            fgcolor=BLACK,
+            size=ZOOM_SIZE)[0], self.f_rects[3])
         self.screen.blit(self.font.render(
             text=f"Use the SPACE BAR to accelerate and press ESC to restart",
             fgcolor=BLACK,
@@ -332,9 +363,6 @@ class Game:
             text=f"+{self.pluspoints:.0f}",
             fgcolor=[0, 0, 0, self.pluspoints_counter],
             size=PLUSPOINTS_SIZE)[0], self.f_rects[6])
-        # self.screen.blit(self.font.render
-        #                  (f"Check Ground: {self.board.checkground}", True, BLACK),
-        #                  (WIDTH - 200, 40))
         pg.display.flip()
 
     def show_start_screen(self):
@@ -368,7 +396,7 @@ class Game:
             self.go_screen.draw(self.screen)
             pg.display.flip()
 
-    def update_fonts(self):
+    def start_fonts(self):
         self.f_rects = [
             self.font.get_rect(text=f"fps {float(self.clock.get_fps().__str__()):.2f}", size=FPS_SIZE),
             self.font.get_rect(text=f"{self.coins_collected}", size=CC_SIZE),
@@ -377,6 +405,7 @@ class Game:
             self.font.get_rect(text=f"Use the SPACE BAR to accelerate and press ESC to restart", size=RULES_SIZE),
             self.font.get_rect(text=f"{self.points:.0f}", size=self.points_size),
             self.font.get_rect(text=f"+{self._pluspoints:.0f}", size=PLUSPOINTS_SIZE),
+            self.font.get_rect(text=f"Air Time {self._airtime}", size=AT_SIZE),
         ]
         self.f_rects[0].topleft = FPS_topleft
         self.f_rects[1].topright = CC_topright
@@ -385,6 +414,7 @@ class Game:
         self.f_rects[4].bottomleft = RULES_bottomleft
         self.f_rects[5].center = POINTS_center
         self.f_rects[6].topleft = Vec(*self.f_rects[5].topright) + (20, 0)
+        self.f_rects[7].topright = AT_topright
 
     def coin_collected(self, arbiter, space, data):
         """
@@ -409,8 +439,8 @@ if __name__ == '__main__':
 
     pg.quit()
 
-    # fig, ax = plt.subplots(3, 1)
-    # ax[0].plot(var)
+    fig, ax = plt.subplots(3, 1)
+    ax[0].plot(var2)
     # ax[0].set_title('velocity')
     # ax[1].plot(var2)
     # ax[1].set_title('zoom')

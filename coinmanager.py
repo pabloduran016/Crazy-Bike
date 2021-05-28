@@ -6,15 +6,16 @@ from random import randrange
 
 
 class CoinManager(pg.sprite.Sprite):
-    def __init__(self, game, period=3, ss=False):
+    def __init__(self, game, period=1.5, ss=False):
         """
         :type game: main.Game
         """
         super().__init__()
         self.idle = IDLE_ANIM
         self.collected = COLLECTED_ANIM
-        self.idle_images = [pg.image.load(self.idle + f'{x}.png').convert_alpha()
-                                 for x in range(IDLE_ANIM_SIZE)]
+        self.idle_images = [pg.transform.scale(
+            pg.image.load(IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png').convert_alpha(), DIMENSIONS)
+            for x in range(IDLE_ANIM_SIZE)]
         self.collected_images = [pg.image.load(self.collected + f'{x}.png').convert_alpha()
                                  for x in range(COLLECTED_ANIM_SIZE)]
         self.rect = self.idle_images[0].get_rect()
@@ -27,10 +28,13 @@ class CoinManager(pg.sprite.Sprite):
         self.game = game
         self.coins = []
         self.space = SPACING
-        self.pos = 1
         self.count = 0
         self.period = period
         self.ss = ss
+
+    def reset(self):
+        self.coins = []
+        self.count = 0
 
     def start(self):
         # self.coins += [Coin(self.game, position=Vec(150, 750), phase=0)]
@@ -60,6 +64,7 @@ class CoinManager(pg.sprite.Sprite):
         coin_y = floor.body.position.y
         length = floor.length
         num = randrange(0, 3)
+        num = 1
         # print(num)
         if num == 1:
             for x in range(int((length - DISTANCE)/100)):

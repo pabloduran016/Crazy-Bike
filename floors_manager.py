@@ -15,6 +15,9 @@ class FloorsManager(pygame.sprite.Sprite):
         self.all = []
         self.game = game
 
+    def reset(self):
+        self.all = []
+
     def start(self):
         # self.all.append(Line(self.game, position=Vec(x, y), final_pos=Vec(x, y) + Vec(512, -256), width=WIDTH))
         self.all.append(HorizontalLine(game=self.game, position=vec(*INITIALPOS), length=800,
@@ -26,7 +29,11 @@ class FloorsManager(pygame.sprite.Sprite):
         # self.game.coin_manager.generate(self.all[-1])
 
     def update(self):
-        lastfloor: Floor = self.all[-1]
+        try:
+            lastfloor: Floor = self.all[-1]
+        except IndexError:
+            print(self.all)
+            raise
         distance = (lastfloor.body.position*self.game.zoom - self.game.camera).length
         while distance < 3000*self.game.zoom:
             # self.all.append(HorizontalLine(game=self.game, position=lastfloor.lastpoint,
