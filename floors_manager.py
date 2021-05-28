@@ -70,7 +70,6 @@ class FloorsManager(pygame.sprite.Sprite):
                     h = randint(-400, 0)
                     self.all.append(Parabola(game=self.game, position=lastfloor.lastpoint, length=le, height=h,
                                              width=WIDTH, up=True))
-            self.game.coin_manager.generate(self.all[-1])
             lastfloor: Floor = self.all[-1]
             self.all.append(HorizontalLine(self.game, position=lastfloor.lastpoint, length=500, width=WIDTH))
             self.game.coin_manager.generate(self.all[-1])

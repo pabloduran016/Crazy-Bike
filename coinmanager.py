@@ -3,6 +3,7 @@ from pymunk import Vec2d as Vec
 from settings.COIN import *
 from coin import Coin
 from random import randrange
+from functions import scale
 
 
 class CoinManager(pg.sprite.Sprite):
@@ -13,9 +14,13 @@ class CoinManager(pg.sprite.Sprite):
         super().__init__()
         self.idle = IDLE_ANIM
         self.collected = COLLECTED_ANIM
-        self.idle_images = [pg.transform.scale(
+        try:
+            self.idle_images = [pg.transform.scale(
             pg.image.load(IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png').convert_alpha(), DIMENSIONS)
             for x in range(IDLE_ANIM_SIZE)]
+        except FileNotFoundError:
+            print([IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png' for x in range(IDLE_ANIM_SIZE)])
+            raise
         self.collected_images = [pg.image.load(self.collected + f'{x}.png').convert_alpha()
                                  for x in range(COLLECTED_ANIM_SIZE)]
         self.rect = self.idle_images[0].get_rect()
@@ -32,9 +37,11 @@ class CoinManager(pg.sprite.Sprite):
         self.period = period
         self.ss = ss
 
-    def reset(self):
+    def reset(self, ss=False):
         self.coins = []
         self.count = 0
+        self.ss = ss
+
 
     def start(self):
         # self.coins += [Coin(self.game, position=Vec(150, 750), phase=0)]
@@ -86,6 +93,7 @@ class CoinManager(pg.sprite.Sprite):
         floor.marked = True
         pass
 
+
     def draw(self):
         for i, coin in enumerate(self.coins):
             if coin.shape.activated:
@@ -99,9 +107,7 @@ class CoinManager(pg.sprite.Sprite):
                 if not self.ss:
                     pos = coin.body.position*self.game.zoom - Vec(self.rect.centerx, self.rect.centery)*self.game.zoom\
                         - self.game.camera + self.game.displacement
-                    self.game.screen.blit(pg.transform.scale(self.idle_images[counter],
-                                                             (round(DIMENSIONS[0]*self.game.zoom),
-                                                              round(DIMENSIONS[1]*self.game.zoom))), pos)
+                    self.game.screen.blit(scale(self.idle_images[counter], zoom=self.game.zoom), pos)
                 else:
                     pos = coin.body.position - Vec(self.rect.centerx, self.rect.centery)
                     self.game.screen.blit(self.idle_images[counter], pos)
@@ -111,14 +117,13 @@ class CoinManager(pg.sprite.Sprite):
                                     (coin.collected_counter // (COLLECTED_ANIM_SIZE - 1)))
                 else:
                     counter = round(coin.collected_counter)
-                assert 0 <= counter <= IDLE_ANIM_SIZE - 1, \
-                    f'Counter must be between 0 and {IDLE_ANIM_SIZE - 1}, was {counter}'
+                assert 0 <= counter <= COLLECTED_ANIM_SIZE - 1, \
+                    f'Counter must be between 0 and {COLLECTED_ANIM_SIZE - 1}, was {counter}'
                 if not self.ss:
                     pos = coin.body.position*self.game.zoom - Vec(self.rect.centerx, self.rect.centery)*self.game.zoom\
                       - self.game.camera + self.game.displacement
-                    self.game.screen.blit(pg.transform.scale(self.collected_images[counter],
-                                                            (round(DIMENSIONS[0] * self.game.zoom),
-                                                             round(DIMENSIONS[1] * self.game.zoom))), pos)
+                    print(counter)
+                    self.game.screen.blit(scale(self.collected_images[counter], zoom=self.game.zoom), pos)
                 else:
                     pos = coin.body.position - Vec(self.rect.centerx, self.rect.centery)
                     self.game.screen.blit(self.collected_images[counter], pos)

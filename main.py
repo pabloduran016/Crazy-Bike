@@ -8,7 +8,7 @@ from wheel import Wheel
 from floors_manager import FloorsManager
 from coinmanager import CoinManager
 from background import Background
-from foreground import Foreground
+# from foreground import Foreground
 from board import Board
 from coin import Coin, SimpleCoin
 from sprite import SpriteGroup
@@ -198,13 +198,13 @@ class Game:
         # self.backwheel = Wheel(self, 'backwheel')
         # self.frontwheel = Wheel(self, 'frontwheel')
         # self.board = Board(self, self.backwheel, self.frontwheel)
-        self.all_sprites.remove(self.coin_manager)
+        # self.all_sprites.remove(self.coin_manager)
         # self.floors = FloorsManager(self)
         # self.coin_manager = CoinManager(self, period=1.5)
         # self.all_sprites.add(self.coin_manager)
         # self.background = Background(self)
         # self.simple_coin = SimpleCoin(self, self.f_rects[1].topleft)
-        self.foreground = Foreground(self)
+        # self.foreground = Foreground(self)
         # self.all_sprites = SpriteGroup()
         # self.all_sprites.add(self.background, self.floors, self.coin_manager, self.simple_coin, self.backwheel,
         #                      self.frontwheel, self.board)  # ,self.foreground)
@@ -368,7 +368,7 @@ class Game:
     def show_start_screen(self):
         # game splash/start screen
         self.waiting = True
-        self.coin_manager = CoinManager(self, ss=True)
+        self.coin_manager.reset(ss=True)
         self.coin_manager.coins = [Coin(self, Vec(x, y), i - (COIN.IDLE_ANIM_SIZE - 1) *
                                         (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
         while self.waiting:
