@@ -128,7 +128,6 @@ class Game:
     def points(self):
         return self._points
 
-
     @points.setter
     def points(self, value):
         self._points = value
@@ -184,7 +183,7 @@ class Game:
 
     def new(self):
         # Start a new game
-        self.delta_zoom =  self.airtime = self.points = self.pluspoints = self._pluspoints_counter = self._distance = \
+        self.delta_zoom = self.airtime = self.points = self.pluspoints = self._pluspoints_counter = self._distance = \
             self.flips = self.coins_collected = self.camera_shake = self.go_counter = 0
         self.zoom = ZOOM
         self.points_size = POINTS_SIZE
@@ -195,20 +194,6 @@ class Game:
         self.scroll = Vec(0, 0)
         self.camera = Vec(0, 0)
         self.camera = Vec(0, 0)
-        # self.backwheel = Wheel(self, 'backwheel')
-        # self.frontwheel = Wheel(self, 'frontwheel')
-        # self.board = Board(self, self.backwheel, self.frontwheel)
-        # self.all_sprites.remove(self.coin_manager)
-        # self.floors = FloorsManager(self)
-        # self.coin_manager = CoinManager(self, period=1.5)
-        # self.all_sprites.add(self.coin_manager)
-        # self.background = Background(self)
-        # self.simple_coin = SimpleCoin(self, self.f_rects[1].topleft)
-        # self.foreground = Foreground(self)
-        # self.all_sprites = SpriteGroup()
-        # self.all_sprites.add(self.background, self.floors, self.coin_manager, self.simple_coin, self.backwheel,
-        #                      self.frontwheel, self.board)  # ,self.foreground)
-        # self.all_sprites.start()
         self.all_sprites.reset()
         # TODO: create a cool foreground
         self.run()
@@ -233,18 +218,13 @@ class Game:
         self.space.step(0.5)
         self.all_sprites.update()
         if not self.crushed:
-            self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
-                            self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom) / 3
+            scroll = scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center + \
+                     self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom
+            self.scroll += (scroll.x/SCROLL_DIVIDER[0], scroll.y/SCROLL_DIVIDER[1])
             # TODO: add smooth zooming when going at high speeds
             if ZOOM_MIN < self.zoom + self.delta_zoom < ZOOM:
                 self.zoom += self.delta_zoom
             self.delta_zoom += -0.002 if self.board.checkground > 10 else +0.002
-            # print(abs(self.board.checkground))
-            # if self.airtime > 60:
-            #     self.zoom = max(self.zoom - ZOOM_DECAY, ZOOM_MIN)
-            # else:
-                # print('out')
-                # self.zoom = min(self.zoom + (ZOOM_INCREASE), ZOOM)
             self.distance = self.board.body.position.x / 5000
             pass
         elif self.go_counter < 100:
@@ -369,7 +349,7 @@ class Game:
         # game splash/start screen
         self.waiting = True
         self.coin_manager.reset(ss=True)
-        self.coin_manager.coins = [Coin(self, Vec(x, y), i - (COIN.IDLE_ANIM_SIZE - 1) *
+        self.coin_manager.coins = [Coin(self, position=Vec(x, y), phase=i - (COIN.IDLE_ANIM_SIZE - 1) *
                                         (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
         while self.waiting:
             self.events()

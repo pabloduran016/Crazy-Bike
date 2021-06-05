@@ -1,5 +1,7 @@
 import pymunk
 import pygame
+from pymunk import Vec2d as Vec
+from math import sin, pi
 from settings.COIN import *
 
 
@@ -26,13 +28,15 @@ class Coin:
         self.game.space.add(self.body, self.shape)
         self.handler = self.game.space.add_collision_handler(2, 4)
         self.handler.begin = self.game.coin_collected
+        self.displacement = Vec(0, 0)
 
     def __str__(self):
         return f'position: {self.position}, phase: {self.phase}, activated: {self.shape.activated}'
 
     def update(self):
-        pass
-
+        self.displacement = Vec(0, AMPLITUD*sin(pi/2 + (self.phase*2*pi/(IDLE_ANIM_SIZE - 1)) +
+                                                DISPLACMETN_OMEGA*pygame.time.get_ticks()/1000))
+        # print(f'{self.displacement.y:.2f}')
     def draw(self):
         pass
 
