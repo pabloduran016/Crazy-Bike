@@ -77,7 +77,16 @@ class Game:
         self.textures['ground'].set_colorkey((255, 255, 255))
         self.textures['grass'].set_colorkey((255, 255, 255))
         self.go_counter = 0
+        self._lasty = 0
         # self.mouse_coins = []
+
+    @property
+    def lasty(self):
+        return self._lasty
+
+    @lasty.setter
+    def lasty(self, value):
+        self._lasty = value
 
     @property
     def coins_collected(self):
@@ -186,6 +195,7 @@ class Game:
         self.delta_zoom = self.airtime = self.points = self.pluspoints = self._pluspoints_counter = self._distance = \
             self.flips = self.coins_collected = self.camera_shake = self.go_counter = 0
         self.zoom = ZOOM
+        self.lasty = 0
         self.points_size = POINTS_SIZE
         self.crushed = False
         self.space = pk.Space()  # Create Pymunk Space
@@ -222,16 +232,17 @@ class Game:
                      self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom
             self.scroll += (scroll.x/SCROLL_DIVIDER[0], scroll.y/SCROLL_DIVIDER[1])
             # TODO: add smooth zooming when going at high speeds
-            if ZOOM_MIN < self.zoom + self.delta_zoom < ZOOM:
-                self.zoom += self.delta_zoom
-            self.delta_zoom += -0.002 if self.board.checkground > 10 else +0.002
-            self.distance = self.board.body.position.x / 5000
+            # distance = abs(self.backwheel.body.position.y - self.lasty)
+            # if distance > 100:
+            #     self.zoom = max(self.zoom - ZOOM_MIN, self.zoom - ZOOM_DECAY)
+            # else:
+            #     self.zoom = min(ZOOM, self.zoom + ZOOM_INCREASE)
             pass
         elif self.go_counter < 100:
             # TODO: fix bugs on the death cam, it doesn´t put the bike on the centre
             self.zoom += 0.003
             self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
-                            self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom) / 20
+                            self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom)
             self.go_counter += 1
         else:
             self.playing = False
@@ -244,8 +255,9 @@ class Game:
             # print(self.pluspoints_counter)
         if self.points_size > POINTS_SIZE:
             self.points_size -= 1
-        var.append(self.backwheel.body.velocity.y)
-        var2.append(self.zoom)
+        var.append(self.lasty)
+        # var.append(self.backwheel.body.velocity.y)
+        # var2.append(self.zoom)
         # var3.append(self.last_vel)
 
     def events(self):
@@ -420,8 +432,8 @@ if __name__ == '__main__':
     pg.quit()
 
     fig, ax = plt.subplots(3, 1)
-    ax[0].plot(var2)
-    # ax[0].set_title('velocity')
+    ax[0].plot(var)
+    ax[0].set_title('lasty')
     # ax[1].plot(var2)
     # ax[1].set_title('zoom')
     # ax[2].set_title('deltavel')

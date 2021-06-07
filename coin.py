@@ -34,8 +34,9 @@ class Coin:
         return f'position: {self.position}, phase: {self.phase}, activated: {self.shape.activated}'
 
     def update(self):
-        self.displacement = Vec(0, AMPLITUD*sin(pi/2 + (self.phase*2*pi/(IDLE_ANIM_SIZE - 1)) +
-                                                DISPLACMETN_OMEGA*pygame.time.get_ticks()/1000))
+        self.displacement = Vec(0, AMPLITUD * sin(pi / 2 + (self.phase*2*pi/(IDLE_ANIM_SIZE - 1)) +
+                                                  DISPLACEMENT_OMEGA * pygame.time.get_ticks() / 1000))
+        # self.body.position += self.displacement
         # print(f'{self.displacement.y:.2f}')
     def draw(self):
         pass

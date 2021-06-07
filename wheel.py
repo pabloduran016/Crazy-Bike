@@ -80,6 +80,8 @@ class Wheel(pygame.sprite.Sprite):
         # pygame.draw.circle(self.game.screen, self.color, self.body.position-self.game.camera, self.radius, self.width)
 
     def check_ground_presolve(self, arbiter, space, data):
+        if self.id == 'backwheel':
+            self.game.lasty = self.body.position.y
         if self.game.airtime:
             # print('begin', self.game.board.checkground)
             self.game.airtime = 0

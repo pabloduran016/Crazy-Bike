@@ -1,6 +1,7 @@
 import pygame as pg
 from pymunk import Vec2d as Vec
 from settings.COIN import *
+from settings.colors import *
 from coin import Coin
 from random import randrange
 from functions import scale
@@ -20,8 +21,8 @@ class CoinManager(pg.sprite.Sprite):
         except FileNotFoundError:
             print([IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png' for x in range(IDLE_ANIM_SIZE)])
             raise
-        self.collected_images = [pg.image.load(self.collected + f'{x}.png').convert_alpha()
-                                 for x in range(COLLECTED_ANIM_SIZE)]
+        # self.collected_images = [pg.image.load(self.collected + f'{x}.png').convert_alpha()
+        #                          for x in range(COLLECTED_ANIM_SIZE)]
         self.rect = pg.Rect(0, 0, DIMENSIONS[0], DIMENSIONS[1])
         # for img in self.collected_images:
         #     for x in range(img.get_width()):
@@ -58,8 +59,9 @@ class CoinManager(pg.sprite.Sprite):
         lis = enumerate(self.coins)
         for i, coin in lis:
             if not coin.shape.activated:
-                coin.collected_counter += 1.2
-                if round(coin.collected_counter) > COLLECTED_ANIM_SIZE - 1:
+                coin.collected_counter += 10
+                if round(coin.collected_counter) > COLLECTED_ANIM_SIZE:
+                    coin.collected_counter = 0
                     coin.ended = True
             if coin.ended:
                 self.game.space.remove(coin.shape, coin.body)
@@ -120,13 +122,32 @@ class CoinManager(pg.sprite.Sprite):
                     counter = round(coin.collected_counter)
                 assert 0 <= counter <= COLLECTED_ANIM_SIZE - 1, \
                     f'Counter must be between 0 and {COLLECTED_ANIM_SIZE - 1}, was {counter}'
+                # if not self.ss:
+                #     pos = (coin.body.position - Vec(*self.rect.center) + coin.displacement) * self.game.zoom \
+                #           - self.game.camera + self.game.displacement
+                #     # print(counter)
+                #     self.game.screen.blit(scale(self.collected_images[counter], original_dimensions=DIMENSIONS,
+                #                                 zoom=self.game.zoom), pos)
+                # else:
+                #     pos = coin.body.position - Vec(self.rect.centerx, self.rect.centery) + coin.displacement
+                #     self.game.screen.blit(scale(self.collected_images[counter], original_dimensions=DIMENSIONS,
+                #                                 zoom=1), pos)
                 if not self.ss:
-                    pos = (coin.body.position - Vec(*self.rect.center) + coin.displacement) * self.game.zoom \
+                    width1 = (((coin.collected_counter + DIMENSIONS[0] / 4) / 100) * DIMENSIONS[0] / 2)
+                    width2 = DIMENSIONS[0] / 4 + DIMENSIONS[0] / 2 - (coin.collected_counter / 200) * (
+                                DIMENSIONS[0] / 4 + DIMENSIONS[0] / 2)
+                    width = max(width1, width2)
+                    image = pg.Surface((width * 2, width * 2), pg.SRCALPHA)
+                    image.set_colorkey((255, 255, 255))
+                    rect = image.get_rect()
+                    pg.draw.circle(image, YELLOW[:3] + (int(255 - 255 * coin.collected_counter / 200),),
+                                   rect.center, width1)
+                    pg.draw.circle(image, WHITE[:3] + (int(255 - 255 * coin.collected_counter / 200),),
+                                   rect.center, width2)
+                    rect.center = coin.body.position + coin.displacement
+                    pos = (coin.body.position + coin.displacement) * self.game.zoom \
                           - self.game.camera + self.game.displacement
-                    # print(counter)
-                    self.game.screen.blit(scale(self.collected_images[counter], original_dimensions=DIMENSIONS,
-                                                zoom=self.game.zoom), pos)
-                else:
-                    pos = coin.body.position - Vec(self.rect.centerx, self.rect.centery) + coin.displacement
-                    self.game.screen.blit(scale(self.collected_images[counter], original_dimensions=DIMENSIONS,
-                                                zoom=1), pos)
+                    rect.center = pos
+                    # pg.draw.rect(self.game.screen, BLACK, rect)
+                    print(rect)
+                    self.game.screen.blit(image, rect)
