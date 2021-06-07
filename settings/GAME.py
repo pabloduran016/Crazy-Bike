@@ -22,5 +22,6 @@ CAMERA_INITIAL_POSITION = (150, 700)
 SHAKE = 4
 
 LOADING_IMAGE = 'Assets/Images/loading.png'
+DATA = 'data.json'
 
 SIMPLE_COIN_POSITION = 834, 27

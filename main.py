@@ -16,6 +16,7 @@ from screens import StartScreen, GoScreen
 from functions import scale
 from random import randint
 import matplotlib.pylab as plt
+import json
 
 var = []
 var2 = []
@@ -37,9 +38,12 @@ class GameProperties:
     camera_focus = Vec(*CAMERA_INITIAL_POSITION)
     scroll = Vec(0, 0)
 
+    with open(DATA, 'r') as f:
+        data = json.load(f)
+
     f_rects = []
 
-    simple_coin = SimpleCoin
+    simple_coin: SimpleCoin
 
     def __init__(self):
         # initialize game window, etc
@@ -94,6 +98,11 @@ class GameProperties:
 
     @crushed.setter
     def crushed(self, value):
+        if not self._crushed:
+            self.points_size = POINTS_SIZE
+            self._pluspoints_counter = 0
+            self.data['coins'] += self._coins_collected
+            self.data['highscore'] = self.points if self.points > self.data['highscore'] else self.data['highscore']
         self._crushed = value
         # if value is True:
         #     self.camera_focus = self.board.body.position
@@ -120,7 +129,6 @@ class GameProperties:
             self.points_size = POINTS_SIZE + POINTS_INCREASE
         # print('increasing')
         self.f_rects[5] = self.font.get_rect(text=f"{self._points:.0f}", size=self.points_size)
-        self.f_rects[5].center = POINTS_center
 
     @property
     def distance(self):
@@ -218,7 +226,7 @@ class Game(GameProperties):
 
     def new(self):
         # Start a new game
-        self.delta_zoom = self.airtime = self.points = self.pluspoints = self._pluspoints_counter = self._distance = \
+        self.delta_zoom = self.airtime = self.pluspoints = self.points = self._pluspoints_counter = self._distance = \
             self.flips = self.coins_collected = self.camera_shake = self.go_counter = 0
         self.zoom = ZOOM
         self.lasty = 0
@@ -415,6 +423,10 @@ class Game(GameProperties):
             self.go_screen.draw(self.screen)
             pg.display.flip()
 
+    def update_json(self):
+        with open(DATA, 'w') as f:
+            json.dump(self.data, f)
+
     def coin_collected(self, arbiter: pk.arbiter.Arbiter, space: pk.Space, data: dict):
         for shape in arbiter.shapes:
             shape: pymunk.Shape
@@ -429,6 +441,7 @@ if __name__ == '__main__':
     g.show_start_screen()
     while g.running:
         g.new()
+        g.update_json()
         g.show_go_screen()
 
     pg.quit()
