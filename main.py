@@ -119,7 +119,7 @@ class GameProperties:
         if not self.crushed and value > 0:
             self.points_size = POINTS_SIZE + POINTS_INCREASE
         # print('increasing')
-        self.f_rects[5] = self.font.get_rect(text=f"{self.points:.0f}", size=self.points_size)
+        self.f_rects[5] = self.font.get_rect(text=f"{self._points:.0f}", size=self.points_size)
         self.f_rects[5].center = POINTS_center
 
     @property
@@ -135,16 +135,14 @@ class GameProperties:
 
     @property
     def pluspoints(self):
-        if 0 > self.pluspoints_counter < 10 or self.crushed:
-            self.points += self._pluspoints
-            self._pluspoints = 0
-            self.pluspoints_counter = 0
         return self._pluspoints
 
     @pluspoints.setter
     def pluspoints(self, value):
         if value > 0:
             self.pluspoints_counter = 255
+        else:
+            self.points += self._pluspoints
         self._pluspoints = value
         self.f_rects[6] = self.font.get_rect(text=f"+{self._pluspoints:.0f}", size=PLUSPOINTS_SIZE)
         self.f_rects[6].topleft = Vec(*self.f_rects[5].topright) + (0, 20)
@@ -155,6 +153,8 @@ class GameProperties:
 
     @pluspoints_counter.setter
     def pluspoints_counter(self, value):
+        if value <= 0:
+            self.pluspoints = 0
         self._pluspoints_counter = value
 
     @property
@@ -257,7 +257,7 @@ class Game(GameProperties):
             scroll = scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center + \
                      self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom
             self.scroll += (scroll.x/SCROLL_DIVIDER[0], scroll.y/SCROLL_DIVIDER[1])
-            self.distance = abs(self.backwheel.body.position.x/5000)
+            self.distance = abs(self.backwheel.body.position.x/10000)
             # TODO: add smooth zooming when going at high speeds
             # distance = abs(self.backwheel.body.position.y - self.lasty)
             # if distance > 100:
@@ -278,7 +278,7 @@ class Game(GameProperties):
             self.camera_shake -= 1
             self.camera += Vec(randint(-SHAKE, SHAKE), randint(-SHAKE, SHAKE))
         if self.pluspoints_counter:
-            self.pluspoints_counter -= 3
+            self.pluspoints_counter = max(0, self.pluspoints_counter - 4)
             # print(self.pluspoints_counter)
         if self.points_size > POINTS_SIZE:
             self.points_size -= 1

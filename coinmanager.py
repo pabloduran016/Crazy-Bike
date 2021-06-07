@@ -59,7 +59,7 @@ class CoinManager(pg.sprite.Sprite):
         lis = enumerate(self.coins)
         for i, coin in lis:
             if not coin.shape.activated:
-                coin.collected_counter += 10
+                coin.collected_counter += 15
                 if round(coin.collected_counter) > COLLECTED_ANIM_SIZE:
                     coin.collected_counter = 0
                     coin.ended = True
