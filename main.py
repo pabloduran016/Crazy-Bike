@@ -104,8 +104,6 @@ class GameProperties:
             self.data['coins'] += self._coins_collected
             self.data['highscore'] = self.points if self.points > self.data['highscore'] else self.data['highscore']
         self._crushed = value
-        # if value is True:
-        #     self.camera_focus = self.board.body.position
 
     @property
     def zoom(self):
