@@ -73,5 +73,4 @@ class SimpleCoin(pygame.sprite.Sprite):
             counter = round(self.counter)
         assert 0 <= counter <= IDLE_ANIM_SIZE - 1, \
             f'Counter must be between 0 and {IDLE_ANIM_SIZE - 1}, was {counter}'
-        if not self.game.crushed:
-            self.game.screen.blit(self.images[int(self.counter)], self.rect)
+        self.game.screen.blit(self.images[int(self.counter)], self.rect)

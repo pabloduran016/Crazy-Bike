@@ -148,6 +148,4 @@ class CoinManager(pg.sprite.Sprite):
                     pos = (coin.body.position + coin.displacement) * self.game.zoom \
                           - self.game.camera + self.game.displacement
                     rect.center = pos
-                    # pg.draw.rect(self.game.screen, BLACK, rect)
-                    print(rect)
                     self.game.screen.blit(image, rect)
