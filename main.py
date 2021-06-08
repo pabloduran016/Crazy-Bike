@@ -290,7 +290,8 @@ class Game(GameProperties):
             #     self.zoom = min(ZOOM, self.zoom + ZOOM_INCREASE)
             pass
         elif self.go_counter < 100:
-            # TODO: fix bugs on the death cam, it doesn´t put the bike on the centre
+            # TODO: fix bugs on the death cam, it doesn't put the bike on the centre
+            # TODO: fix bugs on zooming, textures don't zoom properly
             self.zoom += 0.003
             self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
                             self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom)
@@ -371,7 +372,7 @@ class Game(GameProperties):
         self.texts[5][3] = self.points_size
         self.texts[6][2] = (*self.texts[6][2][:3], self.pluspoints_counter)
         self.texts[0][5] = self.clock.get_fps()
-        self.texts[9][5] = self.board.checkground
+        # self.texts[9][5] = self.board.checkground
         for rect, text, color, size, activated, value in self.texts:
             if activated:
                 self.screen.blit(self.font.render(
