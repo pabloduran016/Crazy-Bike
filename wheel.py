@@ -71,8 +71,15 @@ class BackWheel(Wheel):
         super(BackWheel, self).__init__(*args)
         self.initial_position = Vec(*BACKWHEEL_INITIAL_POSITION)
         self.handler = self.game.space.add_collision_handler(1, 3)
-        self.handler.separate = self.check_ground_separate
         self.handler.begin = self.check_ground_begin
+        self.handler.separate = self.check_ground_separate
+        self.handler.pre_solve = self.check_ground_presolve
+
+    def reset(self):
+        super(BackWheel, self).reset()
+        self.handler = self.game.space.add_collision_handler(1, 3)
+        self.handler.begin = self.check_ground_begin
+        self.handler.separate = self.check_ground_separate
         self.handler.pre_solve = self.check_ground_presolve
 
     def update(self):
@@ -80,13 +87,13 @@ class BackWheel(Wheel):
         super().update()
 
     def check_ground_presolve(self, arbiter, space, data):
+        self.game.board.checkground = 0
         if self.game.airtime:
             # print('begin', self.game.board.checkground)
             self.game.airtime = 0
         return True
 
     def check_ground_begin(self, arbiter, space, data):
-        self.game.board.checkground = 0
         if self.game.airtime:
             # print('begin', self.game.board.checkground)
             self.game.airtime = 0
