@@ -13,7 +13,7 @@ from board import Board
 from coin import Coin, SimpleCoin
 from sprite import SpriteGroup
 from screens import StartScreen, GoScreen
-from functions import scale
+from functions import scale, formated
 from random import randint
 import matplotlib.pylab as plt
 import json
@@ -41,7 +41,7 @@ class GameProperties:
     with open(DATA, 'r') as f:
         data = json.load(f)
 
-    f_rects = []
+    texts = []
 
     simple_coin: SimpleCoin
 
@@ -57,8 +57,10 @@ class GameProperties:
         pg.display.set_caption(TITLE)
         pg.display.set_icon(pg.image.load(ICON))
 
+        self.clock = pg.time.Clock()
+
         self.font = pg_ft.Font(JOYSTIX)
-        self.start_fonts()
+        self.setup_fonts()
 
     @property
     def lasty(self):
@@ -75,11 +77,12 @@ class GameProperties:
     @coins_collected.setter
     def coins_collected(self, value):
         self._coins_collected = value
-        # self.f_rects[1] = self.font.get_rect(text=f"Coins Collected {self.coins_collected}", size=CC_SIZE)
-        self.f_rects[1] = self.font.get_rect(text=f"{self.coins_collected}", size=CC_SIZE)
-        self.f_rects[1].topright = CC_topright
-        self.simple_coin.rect.right = self.f_rects[1].left - 30
-        self.simple_coin.rect.centery = self.f_rects[1].centery
+        # self.texts[1] = self.font.get_rect(text=f"Coins Collected {self.coins_collected}", size=CC_SIZE)
+        self.texts[1][0] = self.font.get_rect(text=f"{self.coins_collected}", size=CC_SIZE)
+        self.texts[1][0].topright = CC_topright
+        self.texts[1][1] = f"{self.coins_collected}"
+        self.simple_coin.rect.right = self.texts[1][0].left - 30
+        self.simple_coin.rect.centery = self.texts[1][0].centery
 
     @property
     def flips(self):
@@ -89,8 +92,9 @@ class GameProperties:
     def flips(self, value):
         self.pluspoints += value - self._flips
         self._flips = value
-        self.f_rects[2] = self.font.get_rect(text=f"FLIPS {self.flips}", size=FLIPS_SIZE)
-        self.f_rects[2].topright = FLIPS_topright
+        self.texts[2][0] = self.font.get_rect(text=f"FLIPS {self.flips}", size=FLIPS_SIZE)
+        self.texts[2][1] = f"FLIPS {self.flips}"
+        self.texts[2][0].topright = FLIPS_topright
 
     @property
     def crushed(self):
@@ -113,8 +117,9 @@ class GameProperties:
     def zoom(self, value):
         self._zoom = value
         self.displacement = self.camera_focus * (1 - self._zoom)
-        self.f_rects[3] = self.font.get_rect(text=f"ZOOM {self.zoom * 100:.0f}", size=ZOOM_SIZE)
-        self.f_rects[3].topright = ZOOM_topright
+        self.texts[3][0] = self.font.get_rect(text=f"ZOOM {self.zoom * 100:.0f}", size=ZOOM_SIZE)
+        self.texts[3][1] = f"ZOOM {self.zoom * 100:.0f}"
+        self.texts[3][0].topright = ZOOM_topright
 
     @property
     def points(self):
@@ -126,7 +131,9 @@ class GameProperties:
         if not self.crushed and value > 0:
             self.points_size = POINTS_SIZE + POINTS_INCREASE
         # print('increasing')
-        self.f_rects[5] = self.font.get_rect(text=f"{self._points:.0f}", size=self.points_size)
+        self.texts[5][0] = self.font.get_rect(text=f"{self._points:.0f}", size=self.points_size)
+        self.texts[5][1] = f"{self._points:.0f}"
+        self.texts[5][0].center = POINTS_center
 
     @property
     def distance(self):
@@ -150,11 +157,12 @@ class GameProperties:
         else:
             self.points += self._pluspoints
         self._pluspoints = value
-        self.f_rects[6] = self.font.get_rect(text=f"+{self._pluspoints:.0f}", size=PLUSPOINTS_SIZE)
-        self.f_rects[6].topleft = Vec(*self.f_rects[5].topright) + (0, 20)
+        self.texts[6][0] = self.font.get_rect(text=f"+{self._pluspoints:.0f}", size=PLUSPOINTS_SIZE)
+        self.texts[6][1] = f"+{self._pluspoints:.0f}"
+        self.texts[6][0].topleft = Vec(*self.texts[5][0].topright) + (0, 20)
 
     @property
-    def pluspoints_counter(self):
+    def pluspoints_counter(self) -> int:
         return self._pluspoints_counter
 
     @pluspoints_counter.setter
@@ -170,28 +178,34 @@ class GameProperties:
     @airtime.setter
     def airtime(self, value):
         self._airtime = value
-        self.f_rects[7] = self.font.get_rect(text=f"Air Time {self._airtime}", size=AT_SIZE)
-        self.f_rects[7].topright = AT_topright
+        self.texts[7][0] = self.font.get_rect(text=f"Air Time {self._airtime}", size=AT_SIZE)
+        self.texts[7][1] = f"Air Time {self._airtime}"
+        self.texts[7][0].topright = AT_topright
 
-    def start_fonts(self):
-        self.f_rects = [
-            self.font.get_rect(text=f"fps 60.00", size=FPS_SIZE),
-            self.font.get_rect(text=f"0", size=CC_SIZE),
-            self.font.get_rect(text=f"FLIPS 0", size=FLIPS_SIZE),
-            self.font.get_rect(text=f"ZOOM {ZOOM*100:.0f}", size=ZOOM_SIZE),
-            self.font.get_rect(text=f"Use the SPACE BAR to accelerate and press ESC to restart", size=RULES_SIZE),
-            self.font.get_rect(text=f"0", size=self.points_size),
-            self.font.get_rect(text=f"+0", size=PLUSPOINTS_SIZE),
-            self.font.get_rect(text=f"Air Time 0", size=AT_SIZE),
+    def setup_fonts(self):
+        self.texts = [
+            [self.font.get_rect(text="fps 60.00", size=FPS_SIZE), "fps {:.2f}", GREY, FPS_SIZE, True, 0],
+            [self.font.get_rect(text='0', size=CC_SIZE), '0', BLACK, CC_SIZE, True, None],
+            [self.font.get_rect(text="FLIPS 0", size=FLIPS_SIZE), "FLIPS 0", BLACK, FLIPS_SIZE, False, None],
+            [self.font.get_rect(text=f"ZOOM {ZOOM*100:.0f}", size=ZOOM_SIZE), f"ZOOM {ZOOM*100:.0f}", BLACK,
+             ZOOM_SIZE, False, None],
+            [self.font.get_rect(text=f"Use the SPACE BAR to accelerate and press ESC to restart", size=RULES_SIZE),
+             f"Use the SPACE BAR to accelerate and press ESC to restart", BLACK, RULES_SIZE, True, None],
+            [self.font.get_rect(text=f"0", size=self.points_size), f"0", BLACK, self.points_size, True, None],
+            [self.font.get_rect(text=f"+0", size=PLUSPOINTS_SIZE), f"+0", BLACK, PLUSPOINTS_SIZE, True, None],
+            [self.font.get_rect(text=f"Air Time 0", size=AT_SIZE), f"Air Time 0", BLACK, AT_SIZE, False, None],
+            [self.font.get_rect(text=f"HIGH SCORE: {self.data['highscore']}", size=HS_SIZE),
+             f"HIGH SCORE: {self.data['highscore']}", BLACK, HS_SIZE, True, None],
         ]
-        self.f_rects[0].topleft = FPS_topleft
-        self.f_rects[1].topright = CC_topright
-        self.f_rects[2].topright = FLIPS_topright
-        self.f_rects[3].topright = ZOOM_topright
-        self.f_rects[4].bottomleft = RULES_bottomleft
-        self.f_rects[5].center = POINTS_center
-        self.f_rects[6].topleft = Vec(*self.f_rects[5].topright) + (20, 0)
-        self.f_rects[7].topright = AT_topright
+        self.texts[0][0].topleft = FPS_topleft
+        self.texts[1][0].topright = CC_topright
+        self.texts[2][0].topright = FLIPS_topright
+        self.texts[3][0].topright = ZOOM_topright
+        self.texts[4][0].bottomleft = RULES_bottomleft
+        self.texts[5][0].center = POINTS_center
+        self.texts[6][0].topleft = Vec(*self.texts[5][0].topright) + (20, 0)
+        self.texts[7][0].topright = AT_topright
+        self.texts[8][0].centerx, self.texts[8][0].top = HS_topcenter
 
 
 class Game(GameProperties):
@@ -212,7 +226,7 @@ class Game(GameProperties):
         self.floors = FloorsManager(self)
         self.coin_manager = CoinManager(self, period=1.5)
         self.background = Background(self)
-        self.simple_coin = SimpleCoin(self, self.f_rects[1].topleft)
+        self.simple_coin = SimpleCoin(self, self.texts[1][0].topleft)
         # self.foreground = Foreground(self)
         self.all_sprites = SpriteGroup()
         self.all_sprites.add(self.background, self.floors, self.coin_manager, self.simple_coin, self.backwheel,
@@ -284,7 +298,7 @@ class Game(GameProperties):
             self.camera_shake -= 1
             self.camera += Vec(randint(-SHAKE, SHAKE), randint(-SHAKE, SHAKE))
         if self.pluspoints_counter:
-            self.pluspoints_counter = max(0, self.pluspoints_counter - 4)
+            self.pluspoints_counter: int = max(0, self.pluspoints_counter - 4)
             # print(self.pluspoints_counter)
         if self.points_size > POINTS_SIZE:
             self.points_size -= 1
@@ -348,46 +362,52 @@ class Game(GameProperties):
             self.space.debug_draw(self.draw_options)
         else:
             self.all_sprites.draw()
-        self.screen.blit(self.font.render(
-            text=f"fps {float(self.clock.get_fps().__str__()):.2f}",
-            fgcolor=GREY,
-            size=FPS_SIZE)[0], self.f_rects[0])
+
+        self.texts[5][3] = self.points_size
+        self.texts[6][2] = (*self.texts[6][2][:3], self.pluspoints_counter)
+        self.texts[0][5] = self.clock.get_fps()
+        for rect, text, color, size, activated, value in self.texts:
+            if activated:
+                self.screen.blit(self.font.render(
+                    text=formated(text, value),
+                    fgcolor=color,
+                    size=size)[0], rect)
         # self.screen.blit(self.font.render(
         #     text=f"Coins Collected {self.coins_collected}",
         #     fgcolor=BLACK,
-        #     size=CC_SIZE)[0], self.f_rects[1])
-        self.screen.blit(self.font.render(
-            text=f"{self.coins_collected}",
-            fgcolor=BLACK,
-            size=CC_SIZE)[0], self.f_rects[1])
+        #     size=CC_SIZE)[0], self.texts[1])
+        # self.screen.blit(self.font.render(
+        #     text=f"{self.coins_collected}",
+        #     fgcolor=BLACK,
+        #     size=CC_SIZE)[0], self.texts[1])
         # self.screen.blit(self.font.render(
         #     text=f"FLIPS {self.flips}",
         #     fgcolor=BLACK,
-        #     size=FLIPS_SIZE)[0], self.f_rects[2])
-        self.screen.blit(self.font.render(
-            text=f"Air Time {self.airtime}",
-            fgcolor=BLACK,
-            size=AT_SIZE)[0], self.f_rects[7])
+        #     size=FLIPS_SIZE)[0], self.texts[2])
+        # self.screen.blit(self.font.render(
+        #     text=f"Air Time {self.airtime}",
+        #     fgcolor=BLACK,
+        #     size=AT_SIZE)[0], self.texts[7])
         # self.screen.blit(self.font.render(
         #     text=f"DISTANCE {self.distance}",
         #     fgcolor=BLACK,
         #     size=FLIPS_SIZE)[0], (40, 40))
-        self.screen.blit(self.font.render(
-            text=f"ZOOM {self.zoom*100:.0f}",
-            fgcolor=BLACK,
-            size=ZOOM_SIZE)[0], self.f_rects[3])
-        self.screen.blit(self.font.render(
-            text=f"Use the SPACE BAR to accelerate and press ESC to restart",
-            fgcolor=BLACK,
-            size=RULES_SIZE)[0], self.f_rects[4])
-        self.screen.blit(self.font.render(
-            text=f"{self.points:.0f}",
-            fgcolor=BLACK,
-            size=self.points_size)[0], self.f_rects[5])
-        self.screen.blit(self.font.render(
-            text=f"+{self.pluspoints:.0f}",
-            fgcolor=[0, 0, 0, self.pluspoints_counter],
-            size=PLUSPOINTS_SIZE)[0], self.f_rects[6])
+        # self.screen.blit(self.font.render(
+        #     text=f"ZOOM {self.zoom*100:.0f}",
+        #     fgcolor=BLACK,
+        #     size=ZOOM_SIZE)[0], self.texts[3])
+        # self.screen.blit(self.font.render(
+        #     text=f"Use the SPACE BAR to accelerate and press ESC to restart",
+        #     fgcolor=BLACK,
+        #     size=RULES_SIZE)[0], self.texts[4])
+        # self.screen.blit(self.font.render(
+        #     text=f"{self.points:.0f}",
+        #     fgcolor=BLACK,
+        #     size=self.points_size)[0], self.texts[5])
+        # self.screen.blit(self.font.render(
+        #     text=f"+{self.pluspoints:.0f}",
+        #     fgcolor=[0, 0, 0, self.pluspoints_counter],
+        #     size=PLUSPOINTS_SIZE)[0], self.texts[6])
         pg.display.flip()
 
     def show_start_screen(self):

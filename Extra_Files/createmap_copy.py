@@ -31,7 +31,7 @@ class MapCreator:
         self.lastdot = initial  # Ultimo valor de la y para enlazar con la siguiente parte
 
     def __str__(self):
-        # Cuando se llama al objeto este devuelve una string de sus atributos
+        # Cuando se llama al objeto este devuelve una value de sus atributos
         data = [self.parablen, self.linelen, self.sinelen, self.parab_a, self.parab_b, self.lineslope, self.sine_d,
                 self.sine_e, self.map, self.totaldistance, self.type, self.lastdot]
         return str(data)

@@ -1,6 +1,7 @@
 import pygame as pg
 from math import pi, exp
 from pymunk import Vec2d as Vec
+from typing import Union
 # import rsvgwrapper
 # import cairo
 # from PIL import Image
@@ -39,6 +40,18 @@ def blitrotate(image, pos, originpos, angle):
 def scale(img, original_dimensions=None, zoom=1):
     dim = original_dimensions if original_dimensions is not None else img.get_rect().size
     return pg.transform.scale(img, (round(dim[0]*zoom), round(dim[1]*zoom)))
+
+
+def formated(original: str, value: Union[str, float]):
+    if value is None:
+        return original
+    else:
+        # print(original)
+        try:
+            return original.format(value)
+        except ValueError as error:
+            print(error)
+            return original
 
 
 def rad_to_degrees(angle):
