@@ -12,7 +12,7 @@ from background import Background
 from board import Board
 from coin import Coin, SimpleCoin
 from sprite import SpriteGroup
-from screens import StartScreen, GoScreen
+from screens import StartScreen, GoScreen, StoreScreen
 from functions import scale, formated
 from random import randint
 import matplotlib.pylab as plt
@@ -38,7 +38,7 @@ class GameProperties:
     camera_focus = Vec(*CAMERA_INITIAL_POSITION)
     scroll = Vec(0, 0)
 
-    last_key_pressed = None
+    current_screen = ''
 
     with open(DATA, 'r') as f:
         data = json.load(f)
@@ -80,9 +80,9 @@ class GameProperties:
     def coins_collected(self, value):
         self._coins_collected = value
         # self.texts[1] = self.font.get_rect(text=f"Coins Collected {self.coins_collected}", size=CC_SIZE)
-        self.texts[1][0] = self.font.get_rect(text=f"{self.coins_collected}", size=CC_SIZE)
+        self.texts[1][0] = self.font.get_rect(text=f"{self.coins_collected + self.data['coins']}", size=CC_SIZE)
         self.texts[1][0].topright = CC_topright
-        self.texts[1][5] = self.coins_collected
+        self.texts[1][5] = self.coins_collected + self.data['coins']
         self.simple_coin.rect.right = self.texts[1][0].left - 30
         self.simple_coin.rect.centery = self.texts[1][0].centery
 
@@ -237,15 +237,16 @@ class Game(GameProperties):
         self.all_sprites = SpriteGroup()
         self.all_sprites.add(self.background, self.floors, self.coin_manager, self.simple_coin, self.backwheel,
                              self.frontwheel, self.board)  # ,self.foreground)
-        self.start_screen = StartScreen(self.font)
-        self.go_screen = GoScreen(self.font, self.coins_collected, self.flips, self.points)
+        self.start_screen = StartScreen(self)
+        self.store_screen = StoreScreen(self)
+        self.go_screen = GoScreen(self)
 
         # self.mouse_coins = []
 
     def new(self):
         # Start a new game
         self.delta_zoom = self.airtime = self.pluspoints = self.points = self._pluspoints_counter = self._distance = \
-            self.flips = self.coins_collected = self.camera_shake = self.go_counter = 0
+            self._flips = self.coins_collected = self.camera_shake = self.go_counter = 0
         self.zoom = ZOOM
         self.lasty = 0
         self.points_size = POINTS_SIZE
@@ -270,7 +271,6 @@ class Game(GameProperties):
             self.update()
             self.clock.tick(FPS)
         g.update_json()
-
 
     def update(self):
         # Game Loop - Update
@@ -330,10 +330,10 @@ class Game(GameProperties):
                     self.crushed = True
                 if event.key == pg.K_SPACE and self.waiting:
                     self.waiting = False
-                    self.last_key_pressed = 'space'
+                    self.current_screen = 'game'
                 if event.key == pg.K_m and self.waiting:
                     self.waiting = False
-                    self.last_key_pressed = 'm'
+                    self.current_screen = 'menu'
                 if event.key == pg.K_r:
                     pass
                 # if event.key == pg.K_UP:
@@ -341,7 +341,8 @@ class Game(GameProperties):
                 # if event.key == pg.K_DOWN:
                 #     self.zoom -= 0.005
             if event.type == pg.MOUSEBUTTONDOWN:
-                if pg.mouse.get_pressed(3)[0] and self.waiting:
+                captured = self.all_sprites.mouseclick(pg.mouse.get_pos())
+                if pg.mouse.get_pressed(3)[0] and self.waiting and not captured:
                     self.waiting = False
                 # print(pg.mouse.get_pos())
                     # self.mouse_coins.append(pg.mouse.get_pos())
@@ -389,10 +390,30 @@ class Game(GameProperties):
                     size=size)[0], rect)
         pg.display.flip()
 
-    def show_start_screen(self):
-        # game splash/start screen
+    def show_store(self):
+        self.store_screen.reset()
         self.waiting = True
         self.coin_manager.reset(ss=True)
+        self.all_sprites.add(self.store_screen)
+        while self.waiting:
+            self.events()
+            self.screen.fill(WHITE)
+            self.store_screen.update()
+            self.store_screen.draw()
+            pg.display.flip()
+            self.clock.tick(FPS)
+        self.all_sprites.remove(self.store_screen)
+        if self.current_screen == 'menu':
+            self.show_menu()
+        # print(self.mouse_coins)
+        pass
+
+    def show_start_screen(self):
+        # game splash/start screen
+        self.start_screen.reset()
+        self.waiting = True
+        self.coin_manager.reset(ss=True)
+        self.all_sprites.add(self.start_screen)
         self.coin_manager.coins = [Coin(self, position=Vec(x, y), phase=i - (COIN.IDLE_ANIM_SIZE - 1) *
                                         (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
         while self.waiting:
@@ -400,35 +421,24 @@ class Game(GameProperties):
             self.screen.fill(WHITE)
             self.start_screen.update()
             self.coin_manager.update()
-            self.start_screen.draw(self.screen)
+            self.start_screen.draw()
             self.coin_manager.draw()
             pg.display.flip()
             self.clock.tick(FPS)
+        self.all_sprites.remove(self.start_screen)
+        if self.current_screen == 'store_button':
+            self.show_store()
         # print(self.mouse_coins)
         pass
 
     def show_menu(self):
         # game splash/start screen
-        self.waiting = True
-        self.coin_manager.reset(ss=True)
-        self.coin_manager.coins = [Coin(self, position=Vec(x, y), phase=i - (COIN.IDLE_ANIM_SIZE - 1) *
-                                        (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
-        while self.waiting:
-            self.events()
-            self.screen.fill(WHITE)
-            self.start_screen.update()
-            self.coin_manager.update()
-            self.start_screen.draw(self.screen)
-            self.coin_manager.draw()
-            pg.display.flip()
-            self.clock.tick(FPS)
-        # print(self.mouse_coins)
-        pass
+        self.show_start_screen()
 
     def show_go_screen(self):
         # GO animation
         self.waiting = True
-        self.go_screen = GoScreen(self.font, self.coins_collected, self.flips, self.points)
+        self.go_screen = GoScreen(self)
         while self.waiting and self.running:
             self.clock.tick(FPS)
             self.update()
@@ -437,9 +447,8 @@ class Game(GameProperties):
             self.go_screen.update()
             self.go_screen.draw(self.screen)
             pg.display.flip()
-        if self.last_key_pressed == 'm':
+        if self.current_screen == 'menu':
             self.show_menu()
-
 
     def update_json(self):
         with open(DATA, 'w') as f:

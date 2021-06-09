@@ -10,3 +10,4 @@ import settings.GOSCREEN
 import settings.STARTSCREEN
 import settings.TEXTURES
 import settings.WHEEL
+import settings.STORESCREEN

@@ -1,0 +1,11 @@
+IMAGE = 'Assets/Images/startscreen2.png'
+CB_SIZE = 70
+CB_center = 450, 200
+STORE_SIZE = 50
+STORE_center = 450, 300
+SPACE_SIZE = 20
+SPACE_center = 450, 800
+M_SIZE = 20
+M_center = 450, 850
+COINS_SIZE = 20
+COINS_topright = 880, 20

@@ -25,3 +25,10 @@ class SpriteGroup(pygame.sprite.Group):
         for obj in self.sprites():
             if hasattr(obj, 'apply_zoom'):
                 obj.apply_zoom(zoom)
+
+    def mouseclick(self, mouse):
+        for obj in self.sprites():
+            if hasattr(obj, 'mouseclick'):
+                captured = obj.mouseclick(mouse)
+                if captured:
+                    return captured
