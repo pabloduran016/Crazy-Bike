@@ -1,6 +1,8 @@
-from settings import STARTSCREEN, GOSCREEN, BLACK, WHITE
+from settings import STARTSCREEN, GOSCREEN
 from settings.FONTS import *
 from pygame.image import load
+from settings.colors import *
+from functions import formated
 
 
 class StartScreen:
@@ -43,18 +45,25 @@ class GoScreen:
         self.flips = flips
         self.points = points
         self.f_color = BLACK
-        self.f_rects = [
-            font.get_rect(text=f"GAME OVER", size=GOSCREEN.GO_SIZE),
-            font.get_rect(text=f"{self.coins_collected}", size=CC_SIZE),
-            font.get_rect(text=f"FLIPS {self.flips}", size=FLIPS_SIZE),
-            font.get_rect(text=f"PRESS SPACE TO CONTINUE", size=GOSCREEN.SPACE_SIZE),
-            font.get_rect(text=f"{self.points:.0f}", size=POINTS_SIZE)
+        self.texts = [
+            [font.get_rect(text=f"GAME OVER", size=GOSCREEN.GO_SIZE), f"GAME OVER", GREY, GOSCREEN.GO_SIZE, True, None],
+            [font.get_rect(text=f"{self.coins_collected}", size=CC_SIZE), f"{self.coins_collected}", BLACK,
+             CC_SIZE, True, None],
+            [font.get_rect(text=f"FLIPS {self.flips}", size=FLIPS_SIZE), f"FLIPS {self.flips}", BLACK, FLIPS_SIZE,
+             False, None],
+            [font.get_rect(text=f"PRESS SPACE TO RESTART", size=GOSCREEN.SPACE_SIZE), f"PRESS SPACE TO RESTART",
+              BLACK, GOSCREEN.SPACE_SIZE, True, None],
+            [font.get_rect(text=f"PRESS M TO GO TO MENU", size=GOSCREEN.MENU_SIZE), f"PRESS M TO GO TO MENU",
+              BLACK, GOSCREEN.MENU_SIZE, True, None],
+            [font.get_rect(text=f"{self.points:.0f}", size=POINTS_SIZE), f"{self.points:.0f}", BLACK, POINTS_SIZE,
+             True, None],
         ]
-        self.f_rects[0].center = GOSCREEN.GO_center
-        self.f_rects[1].topright = CC_topright
-        self.f_rects[2].topright = FLIPS_topright
-        self.f_rects[3].center = GOSCREEN.SPACE_center
-        self.f_rects[4].center = POINTS_center
+        self.texts[0][0].center = GOSCREEN.GO_center
+        self.texts[1][0].topright = CC_topright
+        self.texts[2][0].topright = FLIPS_topright
+        self.texts[3][0].center = GOSCREEN.SPACE_center
+        self.texts[4][0].center = GOSCREEN.MENU_center
+        self.texts[5][0].center = POINTS_center
 
     def update(self):
         self.count += 1/20
@@ -63,23 +72,12 @@ class GoScreen:
         pass
 
     def draw(self, screen):
-        screen.blit(self.font.render(
-            text=f"GAME OVER",
-            fgcolor=BLACK if round(self.count) == 0 else WHITE,
-            size=GOSCREEN.GO_SIZE)[0], self.f_rects[0].topleft)
-        screen.blit(self.font.render(
-            text=f"{self.coins_collected}",
-            fgcolor=BLACK,
-            size=CC_SIZE)[0], self.f_rects[1].topleft)
-        screen.blit(self.font.render(
-            text=f"FLIPS {self.flips}",
-            fgcolor=BLACK,
-            size=FLIPS_SIZE)[0], self.f_rects[2].topleft)
-        screen.blit(self.font.render(
-            text="PRESS SPACE TO CONTINUE",
-            fgcolor=BLACK if round(self.count) == 0 else WHITE,
-            size=GOSCREEN.SPACE_SIZE)[0], self.f_rects[3].topleft)
-        screen.blit(self.font.render(
-            text=f"{self.points:.0f}",
-            fgcolor=BLACK,
-            size=POINTS_SIZE)[0], self.f_rects[4])
+        self.texts[0][2] = BLACK if round(self.count) == 0 else WHITE
+        self.texts[3][2] = BLACK if round(self.count) == 0 else WHITE
+        self.texts[4][2] = WHITE if round(self.count) == 0 else BLACK
+        for rect, text, color, size, activated, value in self.texts:
+            if activated:
+                screen.blit(self.font.render(
+                    text=formated(text, value),
+                    fgcolor=color,
+                    size=size)[0], rect)

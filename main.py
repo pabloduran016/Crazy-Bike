@@ -38,6 +38,8 @@ class GameProperties:
     camera_focus = Vec(*CAMERA_INITIAL_POSITION)
     scroll = Vec(0, 0)
 
+    last_key_pressed = None
+
     with open(DATA, 'r') as f:
         data = json.load(f)
 
@@ -267,6 +269,8 @@ class Game(GameProperties):
             self.draw()
             self.update()
             self.clock.tick(FPS)
+        g.update_json()
+
 
     def update(self):
         # Game Loop - Update
@@ -326,6 +330,10 @@ class Game(GameProperties):
                     self.crushed = True
                 if event.key == pg.K_SPACE and self.waiting:
                     self.waiting = False
+                    self.last_key_pressed = 'space'
+                if event.key == pg.K_m and self.waiting:
+                    self.waiting = False
+                    self.last_key_pressed = 'm'
                 if event.key == pg.K_r:
                     pass
                 # if event.key == pg.K_UP:
@@ -379,45 +387,27 @@ class Game(GameProperties):
                     text=formated(text, value),
                     fgcolor=color,
                     size=size)[0], rect)
-        # self.screen.blit(self.font.render(
-        #     text=f"Coins Collected {self.coins_collected}",
-        #     fgcolor=BLACK,
-        #     size=CC_SIZE)[0], self.texts[1])
-        # self.screen.blit(self.font.render(
-        #     text=f"{self.coins_collected}",
-        #     fgcolor=BLACK,
-        #     size=CC_SIZE)[0], self.texts[1])
-        # self.screen.blit(self.font.render(
-        #     text=f"FLIPS {self.flips}",
-        #     fgcolor=BLACK,
-        #     size=FLIPS_SIZE)[0], self.texts[2])
-        # self.screen.blit(self.font.render(
-        #     text=f"Air Time {self.airtime}",
-        #     fgcolor=BLACK,
-        #     size=AT_SIZE)[0], self.texts[7])
-        # self.screen.blit(self.font.render(
-        #     text=f"DISTANCE {self.distance}",
-        #     fgcolor=BLACK,
-        #     size=FLIPS_SIZE)[0], (40, 40))
-        # self.screen.blit(self.font.render(
-        #     text=f"ZOOM {self.zoom*100:.0f}",
-        #     fgcolor=BLACK,
-        #     size=ZOOM_SIZE)[0], self.texts[3])
-        # self.screen.blit(self.font.render(
-        #     text=f"Use the SPACE BAR to accelerate and press ESC to restart",
-        #     fgcolor=BLACK,
-        #     size=RULES_SIZE)[0], self.texts[4])
-        # self.screen.blit(self.font.render(
-        #     text=f"{self.points:.0f}",
-        #     fgcolor=BLACK,
-        #     size=self.points_size)[0], self.texts[5])
-        # self.screen.blit(self.font.render(
-        #     text=f"+{self.pluspoints:.0f}",
-        #     fgcolor=[0, 0, 0, self.pluspoints_counter],
-        #     size=PLUSPOINTS_SIZE)[0], self.texts[6])
         pg.display.flip()
 
     def show_start_screen(self):
+        # game splash/start screen
+        self.waiting = True
+        self.coin_manager.reset(ss=True)
+        self.coin_manager.coins = [Coin(self, position=Vec(x, y), phase=i - (COIN.IDLE_ANIM_SIZE - 1) *
+                                        (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
+        while self.waiting:
+            self.events()
+            self.screen.fill(WHITE)
+            self.start_screen.update()
+            self.coin_manager.update()
+            self.start_screen.draw(self.screen)
+            self.coin_manager.draw()
+            pg.display.flip()
+            self.clock.tick(FPS)
+        # print(self.mouse_coins)
+        pass
+
+    def show_menu(self):
         # game splash/start screen
         self.waiting = True
         self.coin_manager.reset(ss=True)
@@ -447,6 +437,9 @@ class Game(GameProperties):
             self.go_screen.update()
             self.go_screen.draw(self.screen)
             pg.display.flip()
+        if self.last_key_pressed == 'm':
+            self.show_menu()
+
 
     def update_json(self):
         with open(DATA, 'w') as f:
@@ -466,7 +459,6 @@ if __name__ == '__main__':
     g.show_start_screen()
     while g.running:
         g.new()
-        g.update_json()
         g.show_go_screen()
 
     pg.quit()
