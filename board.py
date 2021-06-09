@@ -7,7 +7,7 @@ vec = pymunk.Vec2d
 
 
 class Board(pygame.sprite.Sprite):
-    def __init__(self, game, body_a, body_b):
+    def __init__(self, game, body_a, body_b, costume='bike'):
         """
         :type game: main.Game
         :param body_a First Body you want to attach
@@ -22,8 +22,9 @@ class Board(pygame.sprite.Sprite):
         # Spring
         self.body_a = body_a
         self.body_b = body_b
-        self.image = pygame.image.load(IMAGE).convert_alpha()
-        self.pivot = vec(*PIVOT)
+        self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+        self.pivot = vec(*COSTUMES[costume]['pivot'])
+        self.dimensions = COSTUMES[costume]['dimensions']
         self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(vec(1, 0))
         # Pymunk Body for the board
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
@@ -45,6 +46,7 @@ class Board(pygame.sprite.Sprite):
         self.handler = self.game.space.add_collision_handler(2, 3)
         self.handler.begin = self.check_ground_begin
         self.flipped = False
+        self.costume = costume
 
     def reset(self):
         self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(vec(1, 0))
@@ -67,6 +69,9 @@ class Board(pygame.sprite.Sprite):
         self.handler = self.game.space.add_collision_handler(2, 3)
         self.handler.begin = self.check_ground_begin
         self.flipped = False
+
+    def change_costume_to(self, costume: str) -> None:
+        pass
 
     def update(self):
         dic = self.game.space._constraints.copy()
@@ -91,7 +96,7 @@ class Board(pygame.sprite.Sprite):
             self.shape.sensor = True
 
     def draw(self):
-        im, pos = blitrotate(scale(self.image, DIMENSIONS, self.game.zoom),
+        im, pos = blitrotate(scale(self.image, self.dimensions, self.game.zoom),
                              self.body.position*self.game.zoom - self.game.camera + self.game.displacement,
                              self.pivot*self.game.zoom, self.angle)
         # print(im.get_size())

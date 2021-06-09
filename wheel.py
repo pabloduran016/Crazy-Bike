@@ -8,7 +8,7 @@ import random
 
 
 class Wheel(pygame.sprite.Sprite):
-    def __init__(self, game):
+    def __init__(self, game, costume='bike'):
         """
         :type game: main.Game
         """
@@ -19,7 +19,9 @@ class Wheel(pygame.sprite.Sprite):
         self.width = WIDTH
         self.thetaacc = THETAACC
         # self.image = load_svg(IMAGE, size=DIMENSIONS).convert_alpha()
-        self.image = pygame.image.load(IMAGE).convert_alpha()
+        self.costume = costume
+        self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+        self.dimensions = COSTUMES[costume]['dimensions']
         self.initial_position = Vec(0, 0)
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
         self.body.position = self.initial_position
@@ -51,7 +53,7 @@ class Wheel(pygame.sprite.Sprite):
 
     def draw(self):
         # if not self.game.crushed:
-        im = scale(self.image, DIMENSIONS, self.game.zoom)
+        im = scale(self.image, self.dimensions, self.game.zoom)
         rect = im.get_rect()
         # print(rect.size)
         rect.center = self.body.position*self.game.zoom - self.game.camera + self.game.displacement

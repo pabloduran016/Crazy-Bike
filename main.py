@@ -282,7 +282,7 @@ class Game(GameProperties):
         self.space.step(0.5)
         self.all_sprites.update()
         if not self.crushed:
-            scroll = scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center + \
+            scroll = scale(self.board.image, self.board.dimensions, self.zoom).get_rect().center + \
                      self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom
             self.scroll += (scroll.x/SCROLL_DIVIDER[0], scroll.y/SCROLL_DIVIDER[1])
             self.distance = abs(self.backwheel.body.position.x/10000)
@@ -297,7 +297,7 @@ class Game(GameProperties):
             # TODO: fix bugs on the death cam, it doesn't put the bike on the centre
             # TODO: fix bugs on zooming, textures don't zoom properly
             self.zoom += 0.003
-            self.scroll += (scale(self.board.image, BOARD.DIMENSIONS, self.zoom).get_rect().center +
+            self.scroll += (scale(self.board.image, self.board.dimensions, self.zoom).get_rect().center +
                             self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom)
             self.go_counter += 1
         else:

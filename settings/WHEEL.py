@@ -4,8 +4,10 @@ DISTANCE = 90
 BACKWHEEL_INITIAL_POSITION = (80, 600)
 # INITIAL_POSITION = {'backwheel': (80, 600),
 #                     'frontwheel': (152, 654)}
-DIMENSIONS = (round(40), round(40))
-IMAGE = 'Assets/Images/motorbikewheel.png'
+COSTUMES = {
+    'motorbike': {'image': 'Assets/Images/Player_costumes/motorbike_wheel.png', 'dimensions': (40, 40)},
+    'bike': {'image': 'Assets/Images/Player_costumes/bike_wheel.png', 'dimensions': (40, 40)},
+}
 COLOR = RED
 RADIUS = 20
 WIDTH = 0
