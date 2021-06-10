@@ -10,6 +10,7 @@ from wheel import Wheel
 from board import Board
 from typing import Union
 from store_item import StoreItem
+from wheel import SimpleWheel
 
 
 class StoreScreen(pg.sprite.Sprite):
@@ -21,6 +22,15 @@ class StoreScreen(pg.sprite.Sprite):
         self.texts = []
         self.wood_texture = pg.image.load(TEXTURES.WOOD).convert()
         self.simple_coin = SimpleCoin(self.game, (0, 0))
+        self.simple_frontwheel = SimpleWheel(
+            position=(STORESCREEN.BACKWHEEL_POSITION[0] + STORESCREEN.WHEELS_DISTANCE,
+                      STORESCREEN.BACKWHEEL_POSITION[1]),
+            costume=self.game.frontwheel.costume,
+            dimensions=STORESCREEN.WHEELS_DIMENSIONS)
+        self.simple_backwheel = SimpleWheel(
+            position=STORESCREEN.BACKWHEEL_POSITION,
+            costume=self.game.backwheel.costume,
+            dimensions=STORESCREEN.WHEELS_DIMENSIONS)
         self.store_items = [StoreItem(
             font=self.game.font,
             size=item[1],
@@ -103,6 +113,8 @@ class StoreScreen(pg.sprite.Sprite):
                     fgcolor=color,
                     size=size)[0], rect)
         self.simple_coin.draw()
+        self.simple_frontwheel.draw(self.game.screen)
+        self.simple_backwheel.draw(self.game.screen)
         for item in self.store_items:
             item.draw(self.game.screen)
 

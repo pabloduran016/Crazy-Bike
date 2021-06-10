@@ -79,6 +79,31 @@ class Wheel(pygame.sprite.Sprite):
         # pygame.draw.circle(self.game.screen, self.color, self.body.position-self.game.camera, self.radius, self.width)
 
 
+class SimpleWheel:
+    def __init__(self, position, costume, dimensions):
+        self.costume = costume
+        self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+        self.dimensions = dimensions
+        self.rect = pygame.Rect(0, 0, *self.dimensions)
+        self.rect.center = position
+        self.available_costumes = COSTUMES.keys()
+
+    def change_costume_to(self, costume: str) -> None:
+        if costume in self.available_costumes:
+            if costume != self.costume:
+                self.costume = costume
+                self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+                self.dimensions = COSTUMES[costume]['dimensions']
+        else:
+            raise ValueError(f'Costume {costume} not known')
+
+    def draw(self, screen):
+        # print(rect.size)
+        im = pygame.transform.scale(self.image, self.dimensions)
+        rect = im.get_rect()
+        rect.center = self.rect.center
+        screen.blit(im, rect)
+
 class FrontWheel(Wheel):
     def __init__(self, *args):
         super(FrontWheel, self).__init__(*args)

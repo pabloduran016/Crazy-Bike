@@ -17,3 +17,7 @@ ITEMS = [
     ['BIKE WHEELS', 15, (2, 0), 'Assets/Images/Player_costumes/bike_wheel.png', 400, 'wheel'],
     ['BIKE BOARD', 15, (3, 0), 'Assets/Images/Player_costumes/bike_board.png', 400, 'board'],
 ]
+
+BACKWHEEL_POSITION = (225, 650)
+WHEELS_DIMENSIONS = 60, 60
+WHEELS_DISTANCE = 90 * WHEELS_DIMENSIONS[0]/40
