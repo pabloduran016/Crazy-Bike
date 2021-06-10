@@ -334,15 +334,18 @@ class Game(GameProperties):
                 if event.key == pg.K_m and self.waiting:
                     self.waiting = False
                     self.current_screen = 'menu'
-                if event.key == pg.K_r:
-                    pass
+                if event.key == pg.K_o:
+                    self.backwheel.change_costume_to(self.backwheel.next_costume())
+                    self.frontwheel.change_costume_to(self.frontwheel.next_costume())
+                if event.key == pg.K_p:
+                    self.board.change_costume_to(self.board.next_costume())
                 # if event.key == pg.K_UP:
                 #     self.zoom += 0.005
                 # if event.key == pg.K_DOWN:
                 #     self.zoom -= 0.005
             if event.type == pg.MOUSEBUTTONDOWN:
                 captured = self.all_sprites.mouseclick(pg.mouse.get_pos())
-                if pg.mouse.get_pressed(3)[0] and self.waiting and not captured:
+                if pg.mouse.get_pressed(3)[0] and self.waiting and not captured and self.current_screen != 'store':
                     self.waiting = False
                 # print(pg.mouse.get_pos())
                     # self.mouse_coins.append(pg.mouse.get_pos())
@@ -426,7 +429,7 @@ class Game(GameProperties):
             pg.display.flip()
             self.clock.tick(FPS)
         self.all_sprites.remove(self.start_screen)
-        if self.current_screen == 'store_button':
+        if self.current_screen == 'store':
             self.show_store()
         # print(self.mouse_coins)
         pass

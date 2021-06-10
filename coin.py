@@ -38,6 +38,7 @@ class Coin:
                                                   DISPLACEMENT_OMEGA * pygame.time.get_ticks() / 1000))
         # self.body.position += self.displacement
         # print(f'{self.displacement.y:.2f}')
+
     def draw(self):
         pass
 
@@ -45,7 +46,7 @@ class Coin:
 class SimpleCoin(pygame.sprite.Sprite):
     def __init__(self, game, position, period=2):
         """
-        :type game: main.Game
+        :type game: Optional[main.Game, None]
         :type position: tuple
         :type period: float
         """
@@ -65,12 +66,15 @@ class SimpleCoin(pygame.sprite.Sprite):
         if round(self.counter) > IDLE_ANIM_SIZE - 1:
             self.counter = 0
 
-    def draw(self):
+    def draw(self, screen=None):
         if round(self.counter) > (IDLE_ANIM_SIZE - 1):
-            counter = round((self.counter) - (IDLE_ANIM_SIZE - 1) *
-                            ((self.counter) // (IDLE_ANIM_SIZE - 1)))
+            counter = round(self.counter - (IDLE_ANIM_SIZE - 1) *
+                            (self.counter // (IDLE_ANIM_SIZE - 1)))
         else:
             counter = round(self.counter)
         assert 0 <= counter <= IDLE_ANIM_SIZE - 1, \
             f'Counter must be between 0 and {IDLE_ANIM_SIZE - 1}, was {counter}'
-        self.game.screen.blit(self.images[int(self.counter)], self.rect)
+        if self.game is not None:
+            self.game.screen.blit(self.images[int(self.counter)], self.rect)
+        else:
+            screen.blit(self.images[int(self.counter)], self.rect)

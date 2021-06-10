@@ -47,6 +47,7 @@ class Board(pygame.sprite.Sprite):
         self.handler.begin = self.check_ground_begin
         self.flipped = False
         self.costume = costume
+        self.available_costumes = COSTUMES.keys()
 
     def reset(self):
         self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(vec(1, 0))
@@ -70,8 +71,22 @@ class Board(pygame.sprite.Sprite):
         self.handler.begin = self.check_ground_begin
         self.flipped = False
 
+    def next_costume(self) -> str:
+        costumes = iter(self.available_costumes)
+        costume = next(costumes)
+        while self.costume == costume:
+            costume = next(costumes)
+        return costume
+
     def change_costume_to(self, costume: str) -> None:
-        pass
+        if costume in self.available_costumes:
+            if costume != self.costume:
+                self.costume = costume
+                self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+                self.pivot = vec(*COSTUMES[costume]['pivot'])
+                self.dimensions = COSTUMES[costume]['dimensions']
+        else:
+            raise ValueError(f'Costume {costume} not known')
 
     def update(self):
         dic = self.game.space._constraints.copy()

@@ -22,6 +22,7 @@ class Wheel(pygame.sprite.Sprite):
         self.costume = costume
         self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
         self.dimensions = COSTUMES[costume]['dimensions']
+        self.available_costumes = COSTUMES.keys()
         self.initial_position = Vec(0, 0)
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
         self.body.position = self.initial_position
@@ -33,6 +34,22 @@ class Wheel(pygame.sprite.Sprite):
         self.shape.collision_type = 1
         self.game.space.add(self.body, self.shape)
         self.shape.filter = pymunk.ShapeFilter(group=1)
+
+    def next_costume(self) -> str:
+        costumes = iter(self.available_costumes)
+        costume = next(costumes)
+        while self.costume == costume:
+            costume = next(costumes)
+        return costume
+
+    def change_costume_to(self, costume: str) -> None:
+        if costume in self.available_costumes:
+            if costume != self.costume:
+                self.costume = costume
+                self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+                self.dimensions = COSTUMES[costume]['dimensions']
+        else:
+            raise ValueError(f'Costume {costume} not known')
 
     def update(self):
         if self.game.crushed:

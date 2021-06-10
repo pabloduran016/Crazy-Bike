@@ -1,4 +1,4 @@
-from settings import STARTSCREEN, GOSCREEN, STORESCREEN
+from settings import STARTSCREEN, GOSCREEN, STORESCREEN, TEXTURES
 from settings.FONTS import *
 from pygame.image import load
 from settings.colors import *
@@ -6,6 +6,10 @@ from functions import formated
 from button import Button
 import pygame as pg
 from coin import SimpleCoin
+from wheel import Wheel
+from board import Board
+from typing import Union
+from store_item import StoreItem
 
 
 class StoreScreen(pg.sprite.Sprite):
@@ -15,7 +19,20 @@ class StoreScreen(pg.sprite.Sprite):
         self.game = game
         self.count = 0
         self.texts = []
+        self.wood_texture = pg.image.load(TEXTURES.WOOD).convert()
         self.simple_coin = SimpleCoin(self.game, (0, 0))
+        self.store_items = [StoreItem(
+            font=self.game.font,
+            size=item[1],
+            text=item[0],
+            price=item[4],
+            dimensions=STORESCREEN.ITEM_DIMENSIONS,
+            image=item[3],
+            topleft=(item[2][0]*(STORESCREEN.ITEM_DIMENSIONS[0] + STORESCREEN.ITEM_SPACING) + STORESCREEN.ITEM_SPACING,
+                     item[2][1]*STORESCREEN.ITEM_DIMENSIONS[0] + 220),
+            texture=self.wood_texture,
+            obj=item[5])
+            for item in STORESCREEN.ITEMS]
         self.setup_fonts()
 
     def setup_fonts(self):
@@ -43,14 +60,34 @@ class StoreScreen(pg.sprite.Sprite):
         self.simple_coin.rect.right = self.texts[4][0].left - 30
         self.simple_coin.rect.centery = self.texts[4][0].centery
 
+    def mouseclick(self, mouse):
+        for item in self.store_items:
+            if item.button.is_clicked(mouse):
+                if item.price < self.game.data['coins']:
+                    if item.obj == 'wheel':
+                        self.purchase(self.game.backwheel, item.item)
+                        self.purchase(self.game.frontwheel, item.item)
+                    elif item.obj == 'board':
+                        self.purchase(self.game.board, item.item)
+
     def reset(self):
         self.setup_fonts()
+
+    @staticmethod
+    def purchase(obj: Union[Wheel, Board], costume: str) -> None:
+        print(obj, costume)
+        if costume in obj.available_costumes:
+            obj.change_costume_to(costume)
+        else:
+            ValueError(f'Costume {costume} not known for {obj}')
 
     def update(self):
         self.count += 1/20
         if round(self.count) > STARTSCREEN.ANIMATION_SIZE - 1:
             self.count = -.5
         self.simple_coin.update()
+        for item in self.store_items:
+            item.update()
         assert round(self.count) == 0 or round(self.count) == 1, f'Expected count to be 1 or cero, got {self.count}'
 
     def draw(self):
@@ -66,6 +103,8 @@ class StoreScreen(pg.sprite.Sprite):
                     fgcolor=color,
                     size=size)[0], rect)
         self.simple_coin.draw()
+        for item in self.store_items:
+            item.draw(self.game.screen)
 
 
 class StartScreen(pg.sprite.Sprite):
@@ -77,9 +116,9 @@ class StartScreen(pg.sprite.Sprite):
         self.texts = []
         self.simple_coin = SimpleCoin(self.game, (0, 0))
         self.setup_fonts()
-        self.store_button = Button(STARTSCREEN.STORE_BUTTON_IMAGE,
-                                   STARTSCREEN.STORE_BUTTON_SIZE,
-                                   STARTSCREEN.STORE_BUTTON_center)
+        self.store_button = Button(image=STARTSCREEN.STORE_BUTTON_IMAGE,
+                                   size=STARTSCREEN.STORE_BUTTON_SIZE,
+                                   center=STARTSCREEN.STORE_BUTTON_center)
         self.store_button.bind(self.store_click)
 
     def setup_fonts(self):
@@ -108,7 +147,7 @@ class StartScreen(pg.sprite.Sprite):
         return self.store_button.mouseclick(mouse)
 
     def store_click(self):
-        self.game.current_screen = 'store_button'
+        self.game.current_screen = 'store'
         self.game.waiting = False
         return True
 
