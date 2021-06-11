@@ -20,8 +20,15 @@ class StoreItem:
             [self.font.get_rect(text=text, size=size), text, color, size, True, None],
             [self.font.get_rect(text=str(price), size=size), str(price), color, size, True, None],
         ]
-        x = round(dimensions[0] * .9)
-        y = round(x * self.image_rect.height/self.image_rect.width)
+        if 'image_width' in kwargs.keys():
+            x = round(kwargs['image_width'])
+            y = round(x * self.image_rect.height / self.image_rect.width)
+        elif 'image_height' in kwargs.keys():
+            y = round(kwargs['image_height'])
+            x = round(y * self.image_rect.width / self.image_rect.height)
+        else:
+            x = round(dimensions[0] * .9)
+            y = round(x * self.image_rect.height / self.image_rect.width)
         self.image = pg.transform.scale(self.image, (x, y))
         self.image_rect = self.image.get_rect()
         self.texture = texture

@@ -271,7 +271,7 @@ class Game(GameProperties):
             self.draw()
             self.update()
             self.clock.tick(FPS)
-        g.update_json()
+        self.update_json()
 
     def update(self):
         # Game Loop - Update
@@ -322,6 +322,7 @@ class Game(GameProperties):
         for event in pg.event.get():
             # check for closing window
             if event.type == pg.QUIT:
+                self.update_json()
                 self.running = False
                 self.playing = False
                 self.waiting = False

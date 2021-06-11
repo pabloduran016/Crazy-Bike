@@ -41,9 +41,12 @@ class StoreScreen(pg.sprite.Sprite):
             text=item[0],
             price=item[4],
             dimensions=STORESCREEN.ITEM_DIMENSIONS,
+            image_height=STORESCREEN.ITEM_IMAGE_DIMENSIONS,
             image=item[3],
-            topleft=(item[2][0]*(STORESCREEN.ITEM_DIMENSIONS[0] + STORESCREEN.ITEM_SPACING) + STORESCREEN.ITEM_SPACING,
-                     item[2][1]*STORESCREEN.ITEM_DIMENSIONS[0] + 220),
+            topleft=(item[2][0]*(STORESCREEN.ITEM_DIMENSIONS[0] +
+                                 STORESCREEN.ITEM_SPACING[0]) + STORESCREEN.ITEM_SPACING[0],
+                     item[2][1]*(STORESCREEN.ITEM_DIMENSIONS[1] +
+                                 STORESCREEN.ITEM_SPACING[1]) + STORESCREEN.ITEM_INITIAL_POSITION[1]),
             texture=self.wood_texture,
             obj=item[5])
             for item in STORESCREEN.ITEMS]
@@ -62,7 +65,9 @@ class StoreScreen(pg.sprite.Sprite):
             [self.game.font.get_rect(text=f"{self.game.data['coins']}", size=STORESCREEN.SPACE_SIZE),
              "{}", BLACK, STORESCREEN.COINS_SIZE, True, self.game.data['coins']],
             [self.game.font.get_rect(text=f"HIGH SCORE: {self.game.data['highscore']}", size=HS_SIZE),
-             "HIGH SCORE: {}", BLACK, HS_SIZE, True, self.game.data['highscore']]
+             "HIGH SCORE: {}", BLACK, HS_SIZE, True, self.game.data['highscore']],
+            [self.game.font.get_rect(text=f"NOT ENOGUTH COINS", size=STORESCREEN.NEC_SIZE),
+             "NOT ENOUGH COINS", RED, STORESCREEN.NEC_SIZE, False, None]
         ]
         self.texts[0][0].center = STORESCREEN.CB_center
         self.texts[1][0].center = STORESCREEN.STORE_center
@@ -70,6 +75,7 @@ class StoreScreen(pg.sprite.Sprite):
         self.texts[3][0].center = STORESCREEN.M_center
         self.texts[4][0].topright = STORESCREEN.COINS_topright
         self.texts[5][0].centerx, self.texts[5][0].top = HS_topcenter
+        self.texts[6][0].center = STORESCREEN.NEC_center
 
         self.simple_coin.rect.right = self.texts[4][0].left - 30
         self.simple_coin.rect.centery = self.texts[4][0].centery
@@ -79,6 +85,7 @@ class StoreScreen(pg.sprite.Sprite):
             if item.button.is_clicked(mouse):
                 if item.price < self.game.data['coins']:
                     item.color = GREY
+                    self.texts[6][4] = False
                     if item.obj == 'wheel':
                         self.purchase(self.game.backwheel, item.item ,item.price)
                         self.simple_backwheel.change_costume_to(item.item)
@@ -88,7 +95,8 @@ class StoreScreen(pg.sprite.Sprite):
                         self.purchase(self.game.board, item.item, item.price)
                         self.simple_board.change_costume_to(item.item)
                 else:
-                    print('you have not enough coins')
+                    # print('you have not enough coins')
+                    self.texts[6][4] = True
                     item.color = RED
             else:
                 item.color = WHITE
@@ -187,6 +195,7 @@ class StartScreen(pg.sprite.Sprite):
 
     def store_click(self):
         self.game.current_screen = 'store'
+        self.game.store_screen.texts[6][4] = False
         self.game.waiting = False
         return True
 
