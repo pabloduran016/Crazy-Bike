@@ -5,6 +5,7 @@ from settings.colors import *
 from functions import formated
 from button import Button
 import pygame as pg
+from pygame import Surface, SurfaceType
 from coin import SimpleCoin
 from wheel import Wheel
 from board import Board
@@ -12,6 +13,7 @@ from typing import Union
 from store_item import StoreItem
 from wheel import SimpleWheel
 from board import SimpleBoard
+from functions import scale
 
 
 class StoreScreen(pg.sprite.Sprite):
@@ -142,8 +144,21 @@ class StartScreen(pg.sprite.Sprite):
         self.setup_fonts()
         self.store_button = Button(image=STARTSCREEN.STORE_BUTTON_IMAGE,
                                    size=STARTSCREEN.STORE_BUTTON_SIZE,
-                                   center=STARTSCREEN.STORE_BUTTON_center)
+                                   center=STARTSCREEN.STORE_BUTTON_center,
+                                   color=WHITE)
         self.store_button.bind(self.store_click)
+        self.store_button.set_instrucion('draw', self.store_button_draw)
+
+    @staticmethod
+    def store_button_draw(button: Button, screen: Union[Surface, SurfaceType]):
+        pg.draw.rect(screen, button.color, button.rect)
+        pg.draw.rect(screen, BLACK, button.rect, width=4)
+        if button.image is not None:
+            im = scale(button.image, zoom=0.8)
+            rect = im.get_rect()
+            rect.center = button.rect.center
+            screen.blit(im, rect)
+
 
     def setup_fonts(self):
         self.texts = [
