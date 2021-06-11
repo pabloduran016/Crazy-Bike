@@ -228,6 +228,7 @@ class Game(GameProperties):
         self.space = pk.Space()
         self.backwheel = BackWheel(self, costume=self.data['costumes']['backwheel'])
         self.frontwheel = FrontWheel(self, costume=self.data['costumes']['frontwheel'])
+        # print(self.data['costumes']['board'])
         self.board = Board(self, self.backwheel, self.frontwheel, costume=self.data['costumes']['board'])
         self.floors = FloorsManager(self)
         self.coin_manager = CoinManager(self, period=1.5)

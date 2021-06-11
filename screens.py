@@ -34,7 +34,7 @@ class StoreScreen(pg.sprite.Sprite):
             costume=self.game.backwheel.costume)
         self.simple_board = SimpleBoard(
             position=STORESCREEN.BACKWHEEL_POSITION,
-            costume=self.game.backwheel.costume)
+            costume=self.game.board.costume)
         self.store_items = [StoreItem(
             font=self.game.font,
             size=item[1],

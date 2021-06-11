@@ -7,6 +7,7 @@ BACKWHEEL_INITIAL_POSITION = (80, 600)
 COSTUMES = {
     'motorbike': {'image': 'Assets/Images/Player_costumes/motorbike_wheel.png', 'dimensions': (40, 40)},
     'bike': {'image': 'Assets/Images/Player_costumes/bike_wheel.png', 'dimensions': (40, 40)},
+    'car': {'image': 'Assets/Images/Player_costumes/car_wheel.png', 'dimensions': (40, 40)},
 }
 COLOR = RED
 RADIUS = 20
