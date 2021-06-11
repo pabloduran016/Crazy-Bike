@@ -11,6 +11,7 @@ from board import Board
 from typing import Union
 from store_item import StoreItem
 from wheel import SimpleWheel
+from board import SimpleBoard
 
 
 class StoreScreen(pg.sprite.Sprite):
@@ -25,12 +26,13 @@ class StoreScreen(pg.sprite.Sprite):
         self.simple_frontwheel = SimpleWheel(
             position=(STORESCREEN.BACKWHEEL_POSITION[0] + STORESCREEN.WHEELS_DISTANCE,
                       STORESCREEN.BACKWHEEL_POSITION[1]),
-            costume=self.game.frontwheel.costume,
-            dimensions=STORESCREEN.WHEELS_DIMENSIONS)
+            costume=self.game.frontwheel.costume)
         self.simple_backwheel = SimpleWheel(
             position=STORESCREEN.BACKWHEEL_POSITION,
-            costume=self.game.backwheel.costume,
-            dimensions=STORESCREEN.WHEELS_DIMENSIONS)
+            costume=self.game.backwheel.costume)
+        self.simple_board = SimpleBoard(
+            position=STORESCREEN.BACKWHEEL_POSITION,
+            costume=self.game.backwheel.costume)
         self.store_items = [StoreItem(
             font=self.game.font,
             size=item[1],
@@ -56,7 +58,7 @@ class StoreScreen(pg.sprite.Sprite):
             [self.game.font.get_rect(text="PRESS M TO RETURN TO MENU", size=STORESCREEN.M_SIZE),
              "PRESS M TO RETURN TO MENU", BLACK, STORESCREEN.M_SIZE, True, None],
             [self.game.font.get_rect(text=f"{self.game.data['coins']}", size=STORESCREEN.SPACE_SIZE),
-             f"{self.game.data['coins']}", BLACK, STORESCREEN.COINS_SIZE, True, None],
+             "{}", BLACK, STORESCREEN.COINS_SIZE, True, self.game.data['coins']],
             [self.game.font.get_rect(text=f"HIGH SCORE: {self.game.data['highscore']}", size=HS_SIZE),
              "HIGH SCORE: {}", BLACK, HS_SIZE, True, self.game.data['highscore']]
         ]
@@ -74,18 +76,26 @@ class StoreScreen(pg.sprite.Sprite):
         for item in self.store_items:
             if item.button.is_clicked(mouse):
                 if item.price < self.game.data['coins']:
+                    item.color = GREY
                     if item.obj == 'wheel':
-                        self.purchase(self.game.backwheel, item.item)
-                        self.purchase(self.game.frontwheel, item.item)
+                        self.purchase(self.game.backwheel, item.item ,item.price)
+                        self.simple_backwheel.change_costume_to(item.item)
+                        self.purchase(self.game.frontwheel, item.item, item.price)
+                        self.simple_frontwheel.change_costume_to(item.item)
                     elif item.obj == 'board':
-                        self.purchase(self.game.board, item.item)
+                        self.purchase(self.game.board, item.item, item.price)
+                        self.simple_board.change_costume_to(item.item)
+                else:
+                    print('you have not enough coins')
+                    item.color = RED
+            else:
+                item.color = WHITE
 
     def reset(self):
         self.setup_fonts()
 
-    @staticmethod
-    def purchase(obj: Union[Wheel, Board], costume: str) -> None:
-        print(obj, costume)
+    def purchase(self, obj: Union[Wheel, Board], costume: str, price: int) -> None:
+        self.game.data['coins'] -= price
         if costume in obj.available_costumes:
             obj.change_costume_to(costume)
         else:
@@ -106,6 +116,7 @@ class StoreScreen(pg.sprite.Sprite):
         self.texts[1][2] = WHITE if round(self.count) == 0 else BLACK
         self.texts[2][2] = BLACK if round(self.count) == 0 else WHITE
         self.texts[3][2] = WHITE if round(self.count) == 0 else BLACK
+        self.texts[4][5] = self.game.data['coins']
         for rect, text, color, size, activated, value in self.texts:
             if activated:
                 self.game.screen.blit(self.game.font.render(
@@ -115,6 +126,7 @@ class StoreScreen(pg.sprite.Sprite):
         self.simple_coin.draw()
         self.simple_frontwheel.draw(self.game.screen)
         self.simple_backwheel.draw(self.game.screen)
+        self.simple_board.draw(self.game.screen)
         for item in self.store_items:
             item.draw(self.game.screen)
 

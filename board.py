@@ -23,6 +23,7 @@ class Board(pygame.sprite.Sprite):
         self.body_a = body_a
         self.body_b = body_b
         self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+        self.available_costumes = COSTUMES.keys()
         self.pivot = vec(*COSTUMES[costume]['pivot'])
         self.dimensions = COSTUMES[costume]['dimensions']
         self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(vec(1, 0))
@@ -47,7 +48,6 @@ class Board(pygame.sprite.Sprite):
         self.handler.begin = self.check_ground_begin
         self.flipped = False
         self.costume = costume
-        self.available_costumes = COSTUMES.keys()
 
     def reset(self):
         self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(vec(1, 0))
@@ -89,7 +89,6 @@ class Board(pygame.sprite.Sprite):
             raise ValueError(f'Costume {costume} not known')
 
     def update(self):
-        dic = self.game.space._constraints.copy()
         if not self.game.crushed:
             self.body.angular_velocity *= AIR_DRAG_MULTIPLIER
             self.angle = round((self.body_b.body.position -
@@ -123,3 +122,43 @@ class Board(pygame.sprite.Sprite):
             if not self.game.camera_shake:
                 self.game.camera_shake = 10
         return True
+
+
+class SimpleBoard:
+    def __init__(self, position, costume):
+        self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+        self.available_costumes = COSTUMES.keys()
+        self.pivot = vec(*COSTUMES[costume]['pivot'])
+        self.dimensions = COSTUMES[costume]['dimensions']
+        self.costume = costume
+        self.position = vec(*position)
+        self.rect = self.image.get_rect()
+        self.rect.topleft = position - self.pivot
+        # self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+        # self.dimensions = dimensions
+        # self.rect = pygame.Rect(0, 0, *dimensions)
+        # self.pivot = vec(*COSTUMES[costume]['pivot'])
+        # self.rect.center =  - self.pivot + position
+        # self.available_costumes = COSTUMES.keys()
+
+    def draw(self, screen):
+        # print(im.get_size())
+        im = pygame.transform.scale(self.image, self.dimensions)
+        rect = im.get_rect()
+        pivot = self.pivot[0]*self.dimensions[0]/COSTUMES[self.costume]['dimensions'][0],\
+                self.pivot[1]*self.dimensions[1]/COSTUMES[self.costume]['dimensions'][1]
+        rect.topleft = self.position - pivot
+        screen.blit(im, rect)
+
+    def change_costume_to(self, costume: str) -> None:
+        if costume in self.available_costumes:
+            if costume != self.costume:
+                self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+                self.available_costumes = COSTUMES.keys()
+                self.pivot = vec(*COSTUMES[costume]['pivot'])
+                self.dimensions = COSTUMES[costume]['dimensions']
+                self.costume = costume
+                self.rect = self.image.get_rect()
+                self.rect.topleft = self.position - self.pivot
+        else:
+            raise ValueError(f'Costume {costume} not known')

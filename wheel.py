@@ -4,10 +4,11 @@ from pymunk import Vec2d as Vec
 from settings.WHEEL import *
 from functions import blitrotate, scale, rad_to_degrees
 import random
+from abc import ABC, abstractmethod
 # from functions import load_svg
 
 
-class Wheel(pygame.sprite.Sprite):
+class Wheel(pygame.sprite.Sprite, ABC):
     def __init__(self, game, costume='bike'):
         """
         :type game: main.Game
@@ -42,12 +43,20 @@ class Wheel(pygame.sprite.Sprite):
             costume = next(costumes)
         return costume
 
+    @abstractmethod
+    def get_id(self):
+        pass
+
     def change_costume_to(self, costume: str) -> None:
+        # print('hello')
         if costume in self.available_costumes:
             if costume != self.costume:
+                self.game.data['costumes'][self.get_id()] = costume
                 self.costume = costume
                 self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
                 self.dimensions = COSTUMES[costume]['dimensions']
+            else:
+                print(f'Costume {costume} is already being used')
         else:
             raise ValueError(f'Costume {costume} not known')
 
@@ -80,10 +89,10 @@ class Wheel(pygame.sprite.Sprite):
 
 
 class SimpleWheel:
-    def __init__(self, position, costume, dimensions):
+    def __init__(self, position, costume):
         self.costume = costume
         self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
-        self.dimensions = dimensions
+        self.dimensions = COSTUMES[costume]['dimensions']
         self.rect = pygame.Rect(0, 0, *self.dimensions)
         self.rect.center = position
         self.available_costumes = COSTUMES.keys()
@@ -93,7 +102,6 @@ class SimpleWheel:
             if costume != self.costume:
                 self.costume = costume
                 self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
-                self.dimensions = COSTUMES[costume]['dimensions']
         else:
             raise ValueError(f'Costume {costume} not known')
 
@@ -105,19 +113,25 @@ class SimpleWheel:
         screen.blit(im, rect)
 
 class FrontWheel(Wheel):
-    def __init__(self, *args):
-        super(FrontWheel, self).__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super(FrontWheel, self).__init__(*args, **kwargs)
         self.initial_position = Vec(*BACKWHEEL_INITIAL_POSITION) + Vec(DISTANCE, 0)
+
+    def get_id(self):
+        return 'frontwheel'
 
 
 class BackWheel(Wheel):
-    def __init__(self, *args):
-        super(BackWheel, self).__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super(BackWheel, self).__init__(*args, **kwargs)
         self.initial_position = Vec(*BACKWHEEL_INITIAL_POSITION)
         self.handler = self.game.space.add_collision_handler(1, 3)
         self.handler.begin = self.check_ground_begin
         self.handler.separate = self.check_ground_separate
         self.handler.pre_solve = self.check_ground_presolve
+
+    def get_id(self):
+        return 'backwheel'
 
     def reset(self):
         super(BackWheel, self).reset()
