@@ -6,7 +6,7 @@ from pymunk import Vec2d as Vec
 class Background(pygame.sprite.Sprite):
     def __init__(self, game):
         """
-        :type game: main.Game
+        :type game: game.Game
         """
         super().__init__()
         self.game = game

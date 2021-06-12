@@ -5,19 +5,18 @@ from settings.FLOORS import *
 import settings.FLOORS as FLOORS
 import pygame
 import pygame.gfxdraw
-from functions import scale
+from Utilities import scale
 
 
 class HorizontalLine(Floor):
-    def __init__(self, game, position, length, width):
+    def __init__(self, position, length, width, **kwargs):
         """
-        :type game: main.Game
         :type position: Vec2d
         :type length: float
         :type width: int
         """
         shape = Segment(body=None, a=(0, 0), b=(length, 0), radius=RADIUS)
-        super().__init__(game=game, position=position, subclass=FLOORS, shape=shape)
+        super().__init__(position=position, subclass=FLOORS, shape=shape, **kwargs)
         self.length = length
         self.width = width
         self.fill = FILL

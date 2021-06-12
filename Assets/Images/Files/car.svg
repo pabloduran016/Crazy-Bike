@@ -80,7 +80,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -111,7 +111,7 @@
      id="layer2"
      inkscape:label="Capa 2"
      transform="translate(142.87892,82.262149)"
-     style="display:none">
+     style="display:inline">
     <path
        id="path1030"
        style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.195;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"

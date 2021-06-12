@@ -7,7 +7,7 @@ vec = pygame.Vector2
 class Map(pygame.sprite.Sprite):
     def __init__(self, game):
         """
-        :type game: main.Game
+        :type game: game.Game
         """
         super().__init__()
         self.creator = MapCreator(MAP.INITIAL_Y)

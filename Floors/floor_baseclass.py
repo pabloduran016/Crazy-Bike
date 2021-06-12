@@ -1,15 +1,18 @@
 import pymunk
 from pymunk import Vec2d, Body as Vec, Body
 from settings.FLOORS import *
+from abc import ABC, abstractmethod
+# from game import Physics
 
 
-class Floor:
-    def __init__(self, game, position, subclass, shape):
+class Floor(ABC):
+    def __init__(self, game, physics, position, subclass, shape):
         """
-        :type game: main.Game
+        :type game: game.Game
         :type position: Vec2d
         """
         self.game = game
+        self.physics = physics
         self.color = subclass.COLOR
         self.body = Body(body_type=Body.STATIC)
         self.body.position = position
@@ -20,10 +23,10 @@ class Floor:
             self.shape.color = self.color
             self.shape.elasticity = ELASTICITY
             self.shape.collision_type = 3
-            self.game.space.add(self.body, self.shape)
+            self.physics.add(self.body, self.shape)
         elif type(shape) == list:
             self.shape = []
-            self.game.space.add(self.body)
+            self.physics.add(self.body)
             for s in shape:
                 s.body = self.body
                 s.friction = subclass.FRICTION
@@ -31,7 +34,7 @@ class Floor:
                 s.collision_type = 3
                 s.elasticity = ELASTICITY
                 self.shape.append(s)
-                self.game.space.add(s)
+                self.physics.add(s)
         self.lastpoint = Vec(0, 0)
         self.eq = None
         self.length = None
@@ -40,5 +43,6 @@ class Floor:
     def update(self):
         pass
 
+    @abstractmethod
     def draw(self):
         pass

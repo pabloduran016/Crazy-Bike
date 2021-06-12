@@ -6,16 +6,15 @@ import pygame
 
 
 class HorizontalPlatform(Floor):
-    def __init__(self, game, position, length, width):
+    def __init__(self, position, length, width, **kwargs):
         """
-        :type game: main.Game
         :type position: pymunk.Vec2d
         """
         self.vertices = [(0, 0), (length, 0), (length, width), (0, width)]
         shape = Poly(body=None, vertices=self.vertices, radius=RADIUS)
         self.width = width
         self.fill = FILL
-        super().__init__(game=game, position=position, subclass=FLOORS, shape=shape)
+        super().__init__(position=position, subclass=FLOORS, shape=shape, **kwargs)
         self.lastpoint = (length, 0) + self.body.position
         self.length = length
         self.eq = lambda x: 0

@@ -1,19 +1,19 @@
 from settings import STARTSCREEN, GOSCREEN, STORESCREEN, TEXTURES
-from settings.FONTS import *
+from settings.TEXT import *
 from pygame.image import load
 from settings.colors import *
-from functions import formated
-from button import Button
+from Utilities import formated
+from Widgets.button import Button
 import pygame as pg
 from pygame import Surface, SurfaceType
-from coin import SimpleCoin
-from wheel import Wheel
-from board import Board
+from Sprites.coin import SimpleCoin
+from Sprites.wheel import Wheel
+from Sprites.board import Board
 from typing import Union
-from store_item import StoreItem
-from wheel import SimpleWheel
-from board import SimpleBoard
-from functions import scale
+from .store_item import StoreItem
+from Sprites.wheel import SimpleWheel
+from Sprites.board import SimpleBoard
+from Utilities import scale
 
 
 class StoreScreen(pg.sprite.Sprite):
@@ -24,7 +24,7 @@ class StoreScreen(pg.sprite.Sprite):
         self.count = 0
         self.texts = []
         self.wood_texture = pg.image.load(TEXTURES.WOOD).convert()
-        self.simple_coin = SimpleCoin(self.game, (0, 0))
+        self.simple_coin = SimpleCoin(self.game, (0, 0), images=self.game.coin_manager.idle_images)
         self.simple_frontwheel = SimpleWheel(
             position=(STORESCREEN.BACKWHEEL_POSITION[0] + STORESCREEN.WHEELS_DISTANCE,
                       STORESCREEN.BACKWHEEL_POSITION[1]),
@@ -48,7 +48,8 @@ class StoreScreen(pg.sprite.Sprite):
                      item[2][1]*(STORESCREEN.ITEM_DIMENSIONS[1] +
                                  STORESCREEN.ITEM_SPACING[1]) + STORESCREEN.ITEM_INITIAL_POSITION[1]),
             texture=self.wood_texture,
-            obj=item[5])
+            obj=item[5],
+            images=self.game.coin_manager.idle_images)
             for item in STORESCREEN.ITEMS]
         self.setup_fonts()
 
@@ -148,7 +149,7 @@ class StartScreen(pg.sprite.Sprite):
         self.image = load(STARTSCREEN.IMAGE).convert_alpha()
         self.count = -.5
         self.texts = []
-        self.simple_coin = SimpleCoin(self.game, (0, 0))
+        self.simple_coin = SimpleCoin(self.game, (0, 0), images=self.game.coin_manager.idle_images)
         self.setup_fonts()
         self.store_button = Button(image=STARTSCREEN.STORE_BUTTON_IMAGE,
                                    size=STARTSCREEN.STORE_BUTTON_SIZE,

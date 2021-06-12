@@ -5,11 +5,11 @@ import pygame
 import pygame.gfxdraw
 from settings.FLOORS import *
 import settings.FLOORS as FLOORS
-from functions import scale
+from Utilities import scale
 
 
 class Parabola(Floor):
-    def __init__(self, game, position, length, height, width, n_segments=10, up=True):
+    def __init__(self, position, length, height, width, n_segments=10, up=True, **kwargs):
         if up:
             self.a = height/length ** 2
             points1 = [Vec(x * length / n_segments, self.a * (x * length / n_segments) ** 2)
@@ -25,7 +25,7 @@ class Parabola(Floor):
         self.points = points1 + points2
         self.grass = points1 + points3
         shape = [Segment(None, a=points1[i-1], b=p, radius=RADIUS) for i, p in enumerate(points1) if i != 0]
-        super().__init__(game=game, position=position, subclass=FLOORS, shape=shape)
+        super().__init__(position=position, subclass=FLOORS, shape=shape, **kwargs)
         self.length = length
         self.lastpoint = points1[-1] + self.body.position
         self.width = width
@@ -51,7 +51,7 @@ class Parabola(Floor):
 
 
 class ParabolaUp(Floor):
-    def __init__(self, game, position, length, height, width, n_segments=10):
+    def __init__(self, position, length, height, width, n_segments=10, **kwargs):
         self.a = height/length**2
         points1 = [Vec(x*length/n_segments, self.a*(x*length/n_segments)**2) for x in range(n_segments)]
         points2 = [v + Vec(0, width) for v in reversed(points1)]
@@ -59,7 +59,7 @@ class ParabolaUp(Floor):
         self.points = points1 + points2
         self.grass = points1 + points3
         shape = [Segment(None, a=points1[i-1], b=p, radius=RADIUS) for i, p in enumerate(points1) if i != 0]
-        super().__init__(game=game, position=position, subclass=FLOORS, shape=shape)
+        super().__init__(position=position, subclass=FLOORS, shape=shape, **kwargs)
         self.length = length
         self.lastpoint = points1[-1] + self.body.position
         self.width = width
@@ -86,7 +86,7 @@ class ParabolaUp(Floor):
 
 
 class ParabolaDown(Floor):
-    def __init__(self, game, position, length, height, width, n_segments=10):
+    def __init__(self, position, length, height, width, n_segments=10, **kwargs):
         self.a = -height/length**2
         points1 = [Vec(x*length/n_segments + length, self.a*(x*length/n_segments)**2 + height)
                    for x in range(-n_segments, 0)]
@@ -95,7 +95,7 @@ class ParabolaDown(Floor):
         self.points = points1 + points2
         self.grass = points1 + points3
         shape = [Segment(None, a=points1[i-1], b=p, radius=RADIUS) for i, p in enumerate(points1) if i != 0]
-        super().__init__(game=game, position=position, subclass=FLOORS, shape=shape)
+        super().__init__(position=position, subclass=FLOORS, shape=shape, **kwargs)
         self.length = length
         self.lastpoint = points1[-1] + self.body.position
         self.width = width

@@ -1,5 +1,4 @@
-from createmap_copy import *  # Se importan las librerías
-from functions import *
+from Functions.functions import *
 from math import *
 # from PIL import Image
 vec = pg.math.Vector2

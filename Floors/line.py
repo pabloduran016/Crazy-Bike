@@ -5,19 +5,18 @@ from settings.FLOORS import *
 import settings.FLOORS as FLOORS
 import pygame
 import pygame.gfxdraw
-from functions import scale
+from Utilities import scale
 
 
 class Line(Floor):
-    def __init__(self, game, position, final_pos, width):
+    def __init__(self, position, final_pos, width, **kwargs):
         """
-        :type game: main.Game
         :type position: Vec2d
         :type final_pos: Vec2d
         :type width: int
         """
         shape = Segment(body=None, a=(0, 0), b=final_pos-position, radius=RADIUS)
-        super().__init__(game=game, position=position, subclass=FLOORS, shape=shape)
+        super().__init__(position=position, subclass=FLOORS, shape=shape, **kwargs)
         self.width = width
         self.length = (final_pos - position).x
         self.height = (final_pos - position).y

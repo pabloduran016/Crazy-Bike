@@ -1,15 +1,15 @@
 import pygame.image
-from joints import pivotjoint
+from Utilities import pivotjoint, scale, blitrotate
 from settings.BOARD import *
 import pymunk.vec2d
-from functions import scale, blitrotate
+# from game import Physics
 vec = pymunk.Vec2d
 
 
 class Board(pygame.sprite.Sprite):
-    def __init__(self, game, body_a, body_b, costume='bike'):
+    def __init__(self, game, physics, body_a, body_b, costume='bike'):
         """
-        :type game: main.Game
+        :type game: game.Game
         :param body_a First Body you want to attach
         :type body_a: wheel.Wheel
         :param body_b Second Body you want to attach
@@ -17,6 +17,7 @@ class Board(pygame.sprite.Sprite):
         """
         super().__init__()
         self.game = game
+        self.physics = physics
         self.color = COLOR
         self.thetaacc = THETAACC
         # Spring
@@ -37,14 +38,14 @@ class Board(pygame.sprite.Sprite):
         self.shape.elasticity = ELASTICITY
         self.shape.collision_type = 2
         self.shape.filter = pymunk.ShapeFilter(group=2)
-        self.game.space.add(self.body, self.shape)
+        self.physics.add(self.body, self.shape)
         self.joint1 = pivotjoint(self.body, self.body_a.body)
         self.joint1.collide_bodies = False
         self.joint2 = pivotjoint(self.body, self.body_b.body, a=self.body_b.body.position - self.body.position)
         self.joint2.collide_bodies = False
-        self.game.space.add(self.joint1, self.joint2)
+        self.physics.add(self.joint1, self.joint2)
         self.checkground = 1
-        self.handler = self.game.space.add_collision_handler(2, 3)
+        self.handler = self.physics.space.add_collision_handler(2, 3)
         self.handler.begin = self.check_ground_begin
         self.flipped = False
         self.costume = costume
@@ -60,14 +61,14 @@ class Board(pygame.sprite.Sprite):
         self.shape.elasticity = ELASTICITY
         self.shape.collision_type = 2
         self.shape.filter = pymunk.ShapeFilter(group=2)
-        self.game.space.add(self.body, self.shape)
+        self.physics.add(self.body, self.shape)
         self.joint1 = pivotjoint(self.body, self.body_a.body)
         self.joint1.collide_bodies = False
         self.joint2 = pivotjoint(self.body, self.body_b.body, a=self.body_b.body.position - self.body.position)
         self.joint2.collide_bodies = False
-        self.game.space.add(self.joint1, self.joint2)
+        self.physics.add(self.joint1, self.joint2)
         self.checkground = 1
-        self.handler = self.game.space.add_collision_handler(2, 3)
+        self.handler = self.physics.space.add_collision_handler(2, 3)
         self.handler.begin = self.check_ground_begin
         self.flipped = False
 
@@ -99,12 +100,12 @@ class Board(pygame.sprite.Sprite):
             elif self.angle > 0 and self.flipped:
                 self.flipped = False
         else:
-            dic = self.game.space._constraints.copy()
+            dic = self.physics.space._constraints.copy()
             for con in dic:
-                self.game.space.remove(con)
+                self.game.physics.remove(con)
             # im, pos = blitrotate(self.image, self.body.position - self.game.camera, self.pivot, self.angle)
             # self.game.screen.blit(im, pos)
-            self.game.space.gravity = (0, 0)
+            self.game.physics.gravity = (0, 0)
             self.body.velocity = (0, 0)
             self.body.angular_velocity = 0
             self.shape.sensor = True
