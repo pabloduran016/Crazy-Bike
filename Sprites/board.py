@@ -103,7 +103,7 @@ class Board(pygame.sprite.Sprite):
             dic = self.physics.space._constraints.copy()
             for con in dic:
                 self.game.physics.remove(con)
-            # im, pos = blitrotate(self.image, self.body.position - self.game.camera, self.pivot, self.angle)
+            # im, pos = blitrotate(self.image, self.body.position - self.game.camera.position, self.pivot, self.angle)
             # self.game.screen.blit(im, pos)
             self.game.physics.gravity = (0, 0)
             self.body.velocity = (0, 0)
@@ -112,7 +112,7 @@ class Board(pygame.sprite.Sprite):
 
     def draw(self):
         im, pos = blitrotate(scale(self.image, self.dimensions, self.game.zoom),
-                             self.body.position*self.game.zoom - self.game.camera + self.game.displacement,
+                             self.body.position*self.game.zoom - self.game.camera.position + self.game.displacement,
                              self.pivot*self.game.zoom, self.angle)
         # print(im.get_size())
         self.game.screen.blit(im, pos)
@@ -120,8 +120,8 @@ class Board(pygame.sprite.Sprite):
     def check_ground_begin(self, arbiter, space, data):
         if not self.game.crushed:
             self.game.crushed = True
-            if not self.game.camera_shake:
-                self.game.camera_shake = 10
+            if not self.game.camera.shake:
+                self.game.camera.shake = 10
         return True
 
 

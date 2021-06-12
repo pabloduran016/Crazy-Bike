@@ -84,10 +84,10 @@ class Wheel(pygame.sprite.Sprite, ABC):
         im = scale(self.image, self.dimensions, self.game.zoom)
         rect = im.get_rect()
         # print(rect.size)
-        rect.center = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
+        rect.center = self.body.position*self.game.zoom - self.game.camera.position + self.game.displacement
         self.game.screen.blit(*blitrotate(im, Vec(*rect.center), Vec(rect.width/2, rect.height/2),
                                           rad_to_degrees(-self.body.angle)))
-        # pygame.draw.circle(self.game.screen, self.color, self.body.position-self.game.camera, self.radius, self.width)
+        # pygame.draw.circle(self.game.screen, self.color, self.body.position-self.game.camera.position, self.radius, self.width)
 
 
 class SimpleWheel:
@@ -158,9 +158,9 @@ class BackWheel(Wheel):
         if self.game.airtime:
             # print('begin', self.game.board.checkground)
             self.game.airtime = 0
-        if not self.game.camera_shake and self.body.velocity.y > 15:
+        if not self.game.camera.shake and self.body.velocity.y > 15:
             # print('shake')
-            self.game.camera_shake = 8
+            self.game.camera.shake = 8
         return True
 
     def check_ground_separate(self, arbiter, space, data):

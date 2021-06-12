@@ -19,7 +19,7 @@ class Foreground(pygame.sprite.Sprite):
         pass
 
     def draw(self):
-        cam = self.game.camera * self.multiplier
+        cam = self.game.camera.position * self.multiplier
         x = int(cam.x / self.rect.width)
         y = 0
         for disp in ((0, 0), (1, 0), (-1, 0)):

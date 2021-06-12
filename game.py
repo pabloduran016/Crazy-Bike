@@ -8,7 +8,6 @@ from settings.TEXT import *
 from Managers import *
 from Sprites import *
 from Utilities import *
-from random import randint
 import matplotlib.pylab as plt
 # from math import sin
 from gameproperties import GameProperties
@@ -44,11 +43,11 @@ class Game(GameProperties):
         self.text_manager.bulk_adding(*TEXT)
         self.text_manager.set_text_update(self.text_update)
 
-        self.camera_focus = Vec(*CAMERA_FOCUS)
+        self.camera = Camera(self, CAMERA_FOCUS)
 
         self.draw_options = pk.pygame_util.DrawOptions(self.screen)
         self.clock = pg.time.Clock()
-        self.physics = Physics()
+        self.physics = Physics(self)
         self.physics.start_space(gravity=GRAVITY)
         self.backwheel = BackWheel(self, self.physics, costume=self.data['costumes']['backwheel'])
         self.frontwheel = FrontWheel(self, self.physics, costume=self.data['costumes']['frontwheel'])
@@ -98,7 +97,7 @@ class Game(GameProperties):
             self.airtime += 1
         self.physics.update()
         self.all_sprites.update()
-        self.update_camera()
+        self.camera.update()
         self.update_fonts()
         # var.append(self.lasty)
         # var.append(self.backwheel.body.velocity.y)
@@ -150,13 +149,13 @@ class Game(GameProperties):
                 self.board.checkground = max(1, self.board.checkground - 1)
                 pass
         if keys[pg.K_d]:
-            self.camera_shake = 8
+            self.camera.shake = 8
         if keys[pg.K_a]:
-            self.camera += Vec(-40, 0)
+            self.camera.position += Vec(-40, 0)
         if keys[pg.K_w]:
-            self.camera += Vec(0, -40)
+            self.camera.position += Vec(0, -40)
         if keys[pg.K_s]:
-            self.camera += Vec(0, 40)
+            self.camera.position += Vec(0, 40)
         if keys[pg.K_UP]:
             self.zoom += 0.005
         if keys[pg.K_DOWN]:
@@ -245,45 +244,8 @@ class Game(GameProperties):
         if self.points_size > POINTS_SIZE:
             self.points_size -= 1
 
-    def update_camera(self):
-        if not self.crushed:
-            self.move_camera()
-        elif self.go_counter < 100:
-            self.death_cam()
-        else:
-            self.playing = False
-        self.camera = Vec(*self.scroll)
-        self.apply_camera_shake()
-
-    def apply_camera_shake(self):
-        if self.camera_shake:
-            self.camera_shake -= 1
-            self.camera += Vec(randint(-SHAKE, SHAKE), randint(-SHAKE, SHAKE))
-
-    def death_cam(self):
-        # TODO: fix bugs on the death cam, it doesn't put the bike on the centre
-        # TODO: fix bugs on zooming, textures don't zoom properly
-        self.zoom += 0.003
-        self.scroll += (scale(self.board.image, self.board.dimensions, self.zoom).get_rect().center +
-                        self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom)
-        self.go_counter += 1
-
-    def move_camera(self):
-        scroll = scale(self.board.image, self.board.dimensions, self.zoom).get_rect().center + \
-                 self.board.body.position * self.zoom - self.scroll - self.camera_focus * self.zoom
-        self.scroll += (scroll.x / SCROLL_DIVIDER[0], scroll.y / SCROLL_DIVIDER[1])
-        self.distance = abs(self.backwheel.body.position.x / 5000)
-        # TODO: add smooth zooming when going at high speeds
-
     def update_data(self):
         self.data_manager.update(self.data)
-
-    def coin_collected(self, arbiter: pk.arbiter.Arbiter, space: pk.Space, data: dict):
-        for shape in arbiter.shapes:
-            shape: pymunk.Shape
-            if hasattr(shape, 'activated'):
-                shape.activated = False
-                self.coins_collected += 1
         return True
 
     @staticmethod

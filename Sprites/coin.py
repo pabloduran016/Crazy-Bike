@@ -32,7 +32,7 @@ class Coin:
             self.shape.sensor = True
             self.physics.add(self.body, self.shape)
             self.handler = self.physics.space.add_collision_handler(2, 4)
-            self.handler.begin = self.game.coin_collected
+            self.handler.begin = self.physics.coin_collected
         self.displacement = Vec(0, 0)
 
     def __str__(self):

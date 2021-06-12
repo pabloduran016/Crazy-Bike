@@ -2,7 +2,8 @@ from settings import *
 from pymunk import Vec2d as Vec
 from Managers import *
 import pygame as pg
-from Sprites.coin import SimpleCoin
+from Sprites import *
+from Utilities import *
 import pygame.freetype as pg_ft
 from settings.TEXT import *
 
@@ -18,9 +19,13 @@ class GameProperties:
     points_size = POINTS_SIZE
     displacement = DISPLACEMENT
 
-    camera: Vec
+    camera: Camera
     camera_focus: Vec
     scroll: Vec = Vec(0, 0)
+
+    backwheel: BackWheel
+    frontwheel: FrontWheel
+    board: Board
 
     current_screen: str
 

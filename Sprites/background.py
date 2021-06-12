@@ -22,14 +22,14 @@ class Background(pygame.sprite.Sprite):
 
     def draw(self):
         # SKY
-        cam = self.game.camera * self.sky_multiplier
+        cam = self.game.camera.position * self.sky_multiplier
         x = int(cam.x / self.rect.width)
         y = int(cam.y / self.rect.height)
         for disp in ((0, 0), (0, 1), (1, 0), (1, 1), (0, -1), (1, -1), (-1, 0), (-1, -1), (-1, 1)):
             position = ((x+disp[0]) * self.rect.width, (y+disp[1]) * self.rect.height)
             self.game.screen.blit(self.sky_image, - cam + position)
         # MOUNTAINS
-        cam = self.game.camera * self.mountain_multiplier
+        cam = self.game.camera.position * self.mountain_multiplier
         x = int(cam.x / self.rect.width)
         y = 0
         for disp in ((0, 0), (1, 0), (-1, 0)):
