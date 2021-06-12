@@ -1,10 +1,8 @@
-from typing import Tuple, Any, List, Union, Callable
+from typing import Tuple, Any, List, Union, Callable, Dict
 from Utilities import formated
 import pygame as pg
 import pygame.freetype as pg_ft
 
-
-POSITIONS = ['topleft', 'topright', 'bottomleft', 'bottomright', 'center', 'centerx', 'centery', 'top', 'bottom']
 
 
 class Text:
@@ -36,13 +34,14 @@ class TextManager:
     def add_text(self, text: str, color: List[int], size: int, visible: bool, formating: Any, **kwargs) -> None:
         t = Text(self.font, text, color, size, visible, formating)
         for key, value in kwargs.items():
-            if key in POSITIONS:
+            if hasattr(t.rect, key):
                 t.rect.__setattr__(key, value)
         self.text.append(t)
 
-    def bulk_adding(self, *args: Tuple[str, Tuple[int], int, bool, Any]) -> None:
+    def bulk_adding(self, *args: Tuple[str, Tuple[int], int, bool, Any,
+                                       Dict[str, Union[Tuple[float, float], float]]]) -> None:
         for arg in args:
-            self.add_text(*arg)
+            self.add_text(*[a for a in arg if type(a) != dict], **arg[-1] if type(arg[-1]) == dict else {'': None})
 
     def draw(self, screen: Union[pg.Surface, pg.SurfaceType]):
         for text in iter(self.text):

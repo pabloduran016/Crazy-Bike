@@ -11,7 +11,7 @@ from Utilities import *
 from random import randint
 import matplotlib.pylab as plt
 # from math import sin
-from .gameproperties import GameProperties
+from gameproperties import GameProperties
 
 var = []
 var2 = []
@@ -72,6 +72,7 @@ class Game(GameProperties):
 
     def new(self):
         # Start a new game
+        self.physics.reset()
         self.reset_variables()
         self.all_sprites.reset()
         self.run()

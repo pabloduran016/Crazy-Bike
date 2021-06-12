@@ -15,8 +15,8 @@ ZOOM_INCREASE = .0001
 DISPLACEMENT = (150*(1-ZOOM), 700*(1-ZOOM))
 # World settings
 GRAVITY = (0, 0.5)
-# DEBUG = False
-DEBUG = True
+DEBUG = False
+# DEBUG = True
 CAMERA_FOCUS = (150, 700)
 
 SHAKE = 4
