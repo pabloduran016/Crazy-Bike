@@ -2,11 +2,12 @@ import pymunk
 from pymunk import Vec2d, Body as Vec, Body
 from settings.FLOORS import *
 from abc import ABC, abstractmethod
+from typing import List, Union
 # from game import Physics
 
 
 class Floor(ABC):
-    def __init__(self, game, physics, position, subclass, shape):
+    def __init__(self, game, physics, position, subclass, shape: Union[List[pymunk.Shape], pymunk.Shape]):
         """
         :type game: game.Game
         :type position: Vec2d
