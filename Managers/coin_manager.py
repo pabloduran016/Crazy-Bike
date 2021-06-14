@@ -5,7 +5,7 @@ from settings.colors import *
 from Sprites.coin import Coin
 from random import randrange
 from Utilities import scale
-from typing import List
+from typing import List, Union
 
 
 class CoinManager(pg.sprite.Sprite):
@@ -29,7 +29,7 @@ class CoinManager(pg.sprite.Sprite):
         self.ss = ss
 
     @staticmethod
-    def load_images(path: str, offset: int, size: int) -> List[pg.Surface, pg.SurfaceType]:
+    def load_images(path: str, offset: int, size: int) -> List[Union[pg.Surface, pg.SurfaceType]]:
         try:
             return [pg.image.load(path + f'{(x + offset):04}.png').convert_alpha() for x in range(size)]
         except FileNotFoundError:
