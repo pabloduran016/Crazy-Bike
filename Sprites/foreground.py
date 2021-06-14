@@ -18,7 +18,7 @@ class Foreground(pygame.sprite.Sprite):
     def update(self):
         pass
 
-    def draw(self):
+    def draw(self) -> None:
         cam = self.game.camera.position * self.multiplier
         x = int(cam.x / self.rect.width)
         y = 0

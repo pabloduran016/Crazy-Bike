@@ -4,12 +4,12 @@ from pymunk import Vec2d as Vec
 from math import sin, pi
 from settings.COIN import *
 from pygame import Surface, SurfaceType
-from typing import List, Union, Optional, Any
+from typing import List, Union, Optional, Any, Tuple
 # from game import Physics
 
 
 class Coin:
-    def __init__(self, game, physics=None, position=(0, 0), phase=0):
+    def __init__(self, game, physics=None, position: Union[Vec, Tuple[float, float]] = (0, 0), phase: int = 0):
         """
         :type game: game.Game
         :type position: Vec2d
@@ -38,21 +38,18 @@ class Coin:
     def __str__(self):
         return f'position: {self.position}, phase: {self.phase}, activated: {self.shape.activated}'
 
-    def update(self):
+    def update(self) -> None:
         self.displacement = Vec(0, AMPLITUD * sin(pi / 2 + (self.phase*2*pi/(IDLE_ANIM_SIZE - 1)) +
                                                   DISPLACEMENT_OMEGA * pygame.time.get_ticks() / 1000))
         # self.body.position += self.displacement
         # print(f'{self.displacement.y:.2f}')
 
-    def draw(self):
-        pass
-
 
 class SimpleCoin(pygame.sprite.Sprite):
-    displacement = Vec(0, 0)
+    displacement: Vec = Vec(0, 0)
 
-    def __init__(self, game: Any, position, period=2, phase=0, moving: bool=False,
-                 images: Optional[List[Union[Surface, SurfaceType]]]=None):
+    def __init__(self, game: Any, position, period=2, phase=0, moving: bool = False,
+                 images: Optional[List[Union[Surface, SurfaceType]]] = None):
         """
         :type game: Optional[main.py.Game, None]
         :type position: tuple
@@ -75,15 +72,15 @@ class SimpleCoin(pygame.sprite.Sprite):
         self.rect.centery = position[1]
         self.moving = moving
 
-    def update(self):
+    def update(self) -> None:
         self.counter += 1 / self.period
         if round(self.counter) + self.phase > IDLE_ANIM_SIZE - 1:
             self.counter = - self.phase
         if self.moving:
             self.displacement = Vec(0, AMPLITUD * sin(pi / 2 + (self.phase * 2 * pi / (IDLE_ANIM_SIZE - 1)) +
-                                                  DISPLACEMENT_OMEGA * pygame.time.get_ticks() / 1000))
+                                                      DISPLACEMENT_OMEGA * pygame.time.get_ticks() / 1000))
 
-    def draw(self, screen=None):
+    def draw(self, screen: Union[pygame.Surface, pygame.SurfaceType] = None) -> None:
         counter = round(self.counter) + self.phase
         assert 0 <= counter <= IDLE_ANIM_SIZE - 1, \
             f'Counter must be between 0 and {IDLE_ANIM_SIZE - 1}, was {counter}'

@@ -1,8 +1,9 @@
-import pygame.image
+import pygame
 from Utilities import pivotjoint, scale, blitrotate
 from settings.BOARD import *
 from pymunk import Vec2d as Vec
 import pymunk
+from typing import Union, Tuple
 # from game import Physics
 
 
@@ -30,7 +31,8 @@ class Board(pygame.sprite.Sprite):
         self.physics = physics
         self.color = COLOR
         self.thetaacc = THETAACC
-        self.load_images(costume)
+        self.available_costumes = COSTUMES.keys()
+        self.load_costume(costume)
         self.body_a = body_a
         self.body_b = body_b
         # Pymunk Body for the board
@@ -39,13 +41,13 @@ class Board(pygame.sprite.Sprite):
         self.costume = costume
         self.checkground = 1
 
-    def load_images(self, costume: str) -> None:
+    def load_costume(self, costume: str) -> None:
+        self.game.data['costumes']['board'] = costume
         self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
-        self.available_costumes = COSTUMES.keys()
         self.pivot = Vec(*COSTUMES[costume]['pivot'])
         self.dimensions = COSTUMES[costume]['dimensions']
 
-    def load_physics(self):
+    def load_physics(self) -> None:
         self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(Vec(1, 0))
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
         self.body.position = self.body_a.body.position
@@ -65,7 +67,7 @@ class Board(pygame.sprite.Sprite):
         self.handler = self.physics.space.add_collision_handler(2, 3)
         self.handler.begin = self.check_ground_begin
 
-    def reset(self):
+    def reset(self) -> None:
         self.load_physics()
         self.checkground = 1
         self.flipped = False
@@ -73,21 +75,18 @@ class Board(pygame.sprite.Sprite):
     def next_costume(self) -> str:
         costumes = iter(self.available_costumes)
         costume = next(costumes)
-        while self.costume == costume:
+        while self.costume != costume:
             costume = next(costumes)
-        return costume
+        return next(costumes)
 
     def change_costume_to(self, costume: str) -> None:
         if costume in self.available_costumes:
             if costume != self.costume:
-                self.costume = costume
-                self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
-                self.pivot = Vec(*COSTUMES[costume]['pivot'])
-                self.dimensions = COSTUMES[costume]['dimensions']
+                self.load_costume(costume)
         else:
             raise ValueError(f'Costume {costume} not known')
 
-    def update(self):
+    def update(self) -> None:
         if not self.game.crushed:
             self.body.angular_velocity *= AIR_DRAG_MULTIPLIER
             self.angle = round((self.body_b.body.position -
@@ -108,14 +107,14 @@ class Board(pygame.sprite.Sprite):
             self.body.angular_velocity = 0
             self.shape.sensor = True
 
-    def draw(self):
+    def draw(self) -> None:
         im, pos = blitrotate(scale(self.image, self.dimensions, self.game.zoom),
                              self.body.position*self.game.zoom - self.game.camera.position + self.game.displacement,
                              self.pivot*self.game.zoom, self.angle)
         # print(im.get_size())
         self.game.screen.blit(im, pos)
 
-    def check_ground_begin(self, arbiter, space, data):
+    def check_ground_begin(self, arbiter, space, data) -> bool:
         if not self.game.crushed:
             self.game.crushed = True
             if not self.game.camera.shake:
@@ -124,7 +123,7 @@ class Board(pygame.sprite.Sprite):
 
 
 class SimpleBoard:
-    def __init__(self, position, costume):
+    def __init__(self, position: Union[Vec, Tuple[float, float]], costume:str):
         self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
         self.available_costumes = COSTUMES.keys()
         self.pivot = Vec(*COSTUMES[costume]['pivot'])
@@ -140,7 +139,7 @@ class SimpleBoard:
         # self.rect.center =  - self.pivot + position
         # self.available_costumes = COSTUMES.keys()
 
-    def draw(self, screen):
+    def draw(self, screen: Union[pygame.Surface, pygame.SurfaceType]) -> None:
         # print(im.get_size())
         im = pygame.transform.scale(self.image, self.dimensions)
         rect = im.get_rect()

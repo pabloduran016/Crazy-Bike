@@ -1,4 +1,5 @@
 import pygame.sprite
+from typing import Tuple
 
 
 class SpriteGroup(pygame.sprite.Group):
@@ -26,7 +27,7 @@ class SpriteGroup(pygame.sprite.Group):
             if hasattr(obj, 'apply_zoom'):
                 obj.apply_zoom(zoom)
 
-    def mouseclick(self, mouse):
+    def mouseclick(self, mouse: Tuple[int, int]):
         for obj in self.sprites():
             if hasattr(obj, 'mouseclick'):
                 captured = obj.mouseclick(mouse)

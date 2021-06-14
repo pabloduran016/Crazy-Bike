@@ -3,10 +3,13 @@ from settings.colors import *
 from Sprites.coin import SimpleCoin
 from Widgets.button import Button
 import pygame.gfxdraw
+from typing import Tuple, Union
 
 
 class StoreItem:
-    def __init__(self, font, text, size, price, dimensions, image, texture, obj, color=WHITE, **kwargs):
+    def __init__(self, font: pg.Font, text: str, size: int, price: int, dimensions: Tuple[int, int],
+                 image: Union[pg.Surface, pg.SurfaceType],
+                 texture: Union[pg.Surface, pg.SurfaceType], obj: str, color=WHITE, **kwargs):
         self.rect = pg.Rect(0, 0, *dimensions)
         self.rect2 = pg.Rect(0, 0, dimensions[0]*1.05, dimensions[1]*1.05)
         self.color = color
@@ -52,10 +55,10 @@ class StoreItem:
         self.simple_coin.rect.left, self.simple_coin.rect.centery = self.text[1][0].right + 20, self.text[1][0].centery
         self.button = Button(size=dimensions, center=self.rect.center)
 
-    def update(self):
+    def update(self) -> None:
         self.simple_coin.update()
 
-    def draw(self, screen):
+    def draw(self, screen: Union[pg.Surface, pg.SurfaceType]) -> None:
         pg.draw.rect(screen, self.color if self.activated else GREY, self.rect2)
         pygame.gfxdraw.textured_polygon(screen, (self.rect.topleft, self.rect.topright, self.rect.bottomright,
                                                  self.rect.bottomleft), self.texture, 0, 0)
@@ -68,5 +71,5 @@ class StoreItem:
         self.simple_coin.draw(screen)
         screen.blit(self.image, self.image_rect)
 
-    def purchase(self):
+    def purchase(self) -> None:
         self.activated = False
