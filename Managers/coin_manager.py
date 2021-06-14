@@ -5,6 +5,7 @@ from settings.colors import *
 from Sprites.coin import Coin
 from random import randrange
 from Utilities import scale
+from typing import List
 
 
 class CoinManager(pg.sprite.Sprite):
@@ -15,12 +16,7 @@ class CoinManager(pg.sprite.Sprite):
         super().__init__()
         self.idle = IDLE_ANIM
         self.collected = COLLECTED_ANIM
-        try:
-            self.idle_images = [pg.image.load(IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png').convert_alpha()
-                                for x in range(IDLE_ANIM_SIZE)]
-        except FileNotFoundError:
-            print([IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png' for x in range(IDLE_ANIM_SIZE)])
-            raise
+        self.idle_images = self.load_images(IDLE_ANIM, IDLE_OFFSET, IDLE_ANIM_SIZE)
         # self.collected_images = [pg.image.load(self.collected + f'{x}.png').convert_alpha()
         #                          for x in range(COLLECTED_ANIM_SIZE)]
         self.rect = pg.Rect(0, 0, DIMENSIONS[0], DIMENSIONS[1])
@@ -31,6 +27,14 @@ class CoinManager(pg.sprite.Sprite):
         self.count = 0
         self.period = period
         self.ss = ss
+
+    @staticmethod
+    def load_images(path: str, offset: int, size: int) -> List[pg.Surface, pg.SurfaceType]:
+        try:
+            return [pg.image.load(path + f'{(x + offset):04}.png').convert_alpha() for x in range(size)]
+        except FileNotFoundError:
+            print([IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png' for x in range(IDLE_ANIM_SIZE)])
+            raise
 
     def reset(self, ss=False):
         self.coins = []
@@ -48,8 +52,10 @@ class CoinManager(pg.sprite.Sprite):
             self.count = 0
         while len(self.coins) > 100:
             self.coins.pop(0)
-        lis = enumerate(self.coins)
-        for i, coin in lis:
+        self.check_collected()
+
+    def check_collected(self):
+        for i, coin in enumerate(self.coins):
             if coin.physics is not None:
                 if not coin.shape.activated:
                     coin.collected_counter += 15
@@ -66,8 +72,6 @@ class CoinManager(pg.sprite.Sprite):
         coin_y = floor.body.position.y
         length = floor.length
         num = randrange(0, 3)
-        # num = 1
-        # print(num)
         if num == 1:
             for x in range(int((length - DISTANCE)/100)):
                 if hasattr(floor, 'slope'):
@@ -123,19 +127,22 @@ class CoinManager(pg.sprite.Sprite):
                         counter = round(coin.collected_counter)
                     assert 0 <= counter <= COLLECTED_ANIM_SIZE - 1, \
                         f'Counter must be between 0 and {COLLECTED_ANIM_SIZE - 1}, was {counter}'
-                    width1 = (((coin.collected_counter + DIMENSIONS[0] / 4) / 100) * DIMENSIONS[0] / 2)
-                    width2 = DIMENSIONS[0] / 4 + DIMENSIONS[0] / 2 - (coin.collected_counter / 200) * (
-                                DIMENSIONS[0] / 4 + DIMENSIONS[0] / 2)
-                    width = max(width1, width2)
-                    image = pg.Surface((width * 2, width * 2), pg.SRCALPHA)
-                    image.set_colorkey((255, 255, 255))
-                    rect = image.get_rect()
-                    pg.draw.circle(image, YELLOW[:3] + (int(255 - 255 * coin.collected_counter / 200),),
-                                   rect.center, width1)
-                    pg.draw.circle(image, WHITE[:3] + (int(255 - 255 * coin.collected_counter / 200),),
-                                   rect.center, width2)
-                    rect.center = coin.body.position + coin.displacement
-                    pos = (coin.body.position + coin.displacement) * self.game.zoom \
-                          - self.game.camera.position + self.game.displacement
-                    rect.center = pos
-                    self.game.screen.blit(image, rect)
+                    self.draw_collected(coin)
+
+    def draw_collected(self, coin):
+        width1 = (((coin.collected_counter + DIMENSIONS[0] / 4) / 100) * DIMENSIONS[0] / 2)
+        width2 = DIMENSIONS[0] / 4 + DIMENSIONS[0] / 2 - (coin.collected_counter / 200) * (
+                    DIMENSIONS[0] / 4 + DIMENSIONS[0] / 2)
+        width = max(width1, width2)
+        image = pg.Surface((width * 2, width * 2), pg.SRCALPHA)
+        image.set_colorkey((255, 255, 255))
+        rect = image.get_rect()
+        pg.draw.circle(image, YELLOW[:3] + (int(255 - 255 * coin.collected_counter / 200),),
+                       rect.center, width1)
+        pg.draw.circle(image, WHITE[:3] + (int(255 - 255 * coin.collected_counter / 200),),
+                       rect.center, width2)
+        rect.center = coin.body.position + coin.displacement
+        pos = (coin.body.position + coin.displacement) * self.game.zoom \
+              - self.game.camera.position + self.game.displacement
+        rect.center = pos
+        self.game.screen.blit(image, rect)
