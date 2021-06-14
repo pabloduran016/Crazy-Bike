@@ -6,10 +6,12 @@ import pygame.gfxdraw
 from settings.FLOORS import *
 import settings.FLOORS as FLOORS
 from Utilities import scale
+from typing import Union, Tuple
 
 
 class Parabola(Floor):
-    def __init__(self, position, length, height, width, n_segments=10, up=True, **kwargs):
+    def __init__(self, position: Union[Vec, Tuple[float, float]], length: float, height: float, width: float,
+                 n_segments: int = 10, up: bool = True, **kwargs):
         if up:
             self.a = height/length ** 2
             points1 = [Vec(x * length / n_segments, self.a * (x * length / n_segments) ** 2)
@@ -52,7 +54,8 @@ class Parabola(Floor):
 
 
 class ParabolaUp(Floor):
-    def __init__(self, position, length, height, width, n_segments=10, **kwargs):
+    def __init__(self, position: Union[Vec, Tuple[float, float]], length: float, height: float, width: float,
+                 n_segments: int = 10, **kwargs):
         self.a = height/length**2
         points1 = [Vec(x*length/n_segments, self.a*(x*length/n_segments)**2) for x in range(n_segments)]
         points2 = [v + Vec(0, width) for v in reversed(points1)]
@@ -88,7 +91,8 @@ class ParabolaUp(Floor):
 
 
 class ParabolaDown(Floor):
-    def __init__(self, position, length, height, width, n_segments=10, **kwargs):
+    def __init__(self, position: Union[Vec, Tuple[float, float]], length: float, height: float, width: float,
+                 n_segments: int = 10, **kwargs):
         self.a = -height/length**2
         points1 = [Vec(x*length/n_segments + length, self.a*(x*length/n_segments)**2 + height)
                    for x in range(-n_segments, 0)]

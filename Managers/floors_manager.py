@@ -17,15 +17,15 @@ class FloorsManager(pygame.sprite.Sprite):
         self.game = game
         self.physics = physics
 
-    def reset(self):
+    def reset(self) -> None:
         self.all = []
 
-    def start(self):
+    def start(self) -> None:
         self.all.append(HorizontalLine(game=self.game, physics=self.physics, position=Vec(*INITIALPOS), length=800,
                                        width=WIDTH))
         self.create_horizontalline(Vec(*INITIALPOS), 800)
 
-    def update(self):
+    def update(self) -> None:
         lastfloor: Floor = self.all[-1]
         distance = (lastfloor.body.position*self.game.zoom - self.game.camera.position).length
         while distance < 3000*self.game.zoom:
@@ -81,6 +81,6 @@ class FloorsManager(pygame.sprite.Sprite):
         self.all.append(Line(game=self.game, physics=self.physics, position=position,
                              final_pos=position + Vec(length, h), width=WIDTH))
 
-    def draw(self):
+    def draw(self) -> None:
         for floor in self.all:
             floor.draw()

@@ -5,7 +5,7 @@ import pygame as pg
 class TextureManager:
     textures: Dict[str, Union[pg.Surface, pg.SurfaceType]] = {}
 
-    def add(self, *args: Tuple[str, str]):
+    def add(self, *args: Tuple[str, str]) -> None:
         for name, tex in args:
             if name not in self.textures.keys():
                 self.textures[name] = pg.image.load(tex).convert()

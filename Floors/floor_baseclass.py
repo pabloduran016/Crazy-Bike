@@ -2,12 +2,13 @@ import pymunk
 from pymunk import Vec2d, Body as Vec, Body
 from settings.FLOORS import *
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import List, Union, Tuple
 # from game import Physics
 
 
 class Floor(ABC):
-    def __init__(self, game, physics, position, subclass, shape: Union[List[pymunk.Shape], pymunk.Shape]):
+    def __init__(self, game, physics, position: Union[Vec, Tuple[float, float]], subclass,
+                 shape: Union[List[pymunk.Shape], pymunk.Shape]):
         """
         :type game: game.Game
         :type position: Vec2d
@@ -28,7 +29,7 @@ class Floor(ABC):
         self.length = None
         self.marcked = False
 
-    def add_shape(self, shape, subclass):
+    def add_shape(self, shape: pymunk.Shape, subclass) -> pymunk.Shape:
         s = shape
         s.body = self.body
         s.friction = subclass.FRICTION
@@ -38,9 +39,9 @@ class Floor(ABC):
         self.physics.add(s)
         return s
 
-    def update(self):
+    def update(self) -> None:
         pass
 
     @abstractmethod
-    def draw(self):
+    def draw(self) -> None:
         pass

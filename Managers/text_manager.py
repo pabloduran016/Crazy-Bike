@@ -43,7 +43,7 @@ class TextManager:
         for arg in args:
             self.add_text(*[a for a in arg if type(a) != dict], **arg[-1] if type(arg[-1]) == dict else {'': None})
 
-    def draw(self, screen: Union[pg.Surface, pg.SurfaceType]):
+    def draw(self, screen: Union[pg.Surface, pg.SurfaceType]) -> None:
         for text in iter(self.text):
             if text.visible:
                 screen.blit(self.font.render(
@@ -51,9 +51,9 @@ class TextManager:
                         fgcolor=text.color,
                         size=text.size)[0], text.rect)
 
-    def set_text_update(self, function: Callable):
+    def set_text_update(self, function: Callable) -> None:
         self.function = function
 
-    def update(self):
+    def update(self) -> None:
         if self.function is not None:
             return self.function()

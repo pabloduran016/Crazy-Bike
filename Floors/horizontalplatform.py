@@ -1,12 +1,14 @@
 from .floor_baseclass import Floor
 from pymunk import Poly
+from pymunk import Vec2d as Vec
 from settings.FLOORS import *
 import settings.FLOORS as FLOORS
 import pygame
+from typing import Union, Tuple
 
 
 class HorizontalPlatform(Floor):
-    def __init__(self, position, length, width, **kwargs):
+    def __init__(self, position: Union[Vec, Tuple[float, float]], length: float, width: float, **kwargs):
         """
         :type position: pymunk.Vec2d
         """
@@ -19,7 +21,7 @@ class HorizontalPlatform(Floor):
         self.length = length
         self.eq = lambda x: 0
 
-    def draw(self):
+    def draw(self) -> None:
         vertices = [vertice + self.body.position - self.game.camera.position for vertice in self.vertices]
         pygame.draw.polygon(self.game.screen, self.color, vertices, self.fill)
         # pygame.draw.lines(self.game.screen, self.color, closed=True, points=vertices, width=4)

@@ -6,10 +6,12 @@ import settings.FLOORS as FLOORS
 import pygame
 import pygame.gfxdraw
 from Utilities import scale
+from typing import Union, Tuple
 
 
 class Line(Floor):
-    def __init__(self, position, final_pos, width, **kwargs):
+    def __init__(self, position: Union[Vec, Tuple[float, float]], final_pos: Union[Vec, Tuple[float, float]],
+                 width: float, **kwargs):
         """
         :type position: Vec2d
         :type final_pos: Vec2d
@@ -30,7 +32,7 @@ class Line(Floor):
         self.texture_manager = self.game.texture_manager
         self.eq = lambda p: self.slope*p
 
-    def draw(self):
+    def draw(self) -> None:
         offset = self.body.position*self.game.zoom - self.game.camera.position + self.game.displacement
         for group, tex in ((self.vertices, 'ground'), (self.grass, 'grass')):
             points = [(p + self.body.position) * self.game.zoom - self.game.camera.position + self.game.displacement

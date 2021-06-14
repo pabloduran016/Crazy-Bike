@@ -6,6 +6,7 @@ from Sprites.coin import Coin
 from random import randrange
 from Utilities import scale
 from typing import List, Union
+from Floors import Floor
 
 
 class CoinManager(pg.sprite.Sprite):
@@ -36,15 +37,12 @@ class CoinManager(pg.sprite.Sprite):
             print([IDLE_ANIM + f'{(x + IDLE_OFFSET):04}.png' for x in range(IDLE_ANIM_SIZE)])
             raise
 
-    def reset(self, ss=False):
+    def reset(self, ss: bool =False) -> None:
         self.coins = []
         self.count = 0
         self.ss = ss
 
-    def start(self):
-        pass
-
-    def update(self):
+    def update(self) -> None:
         for coin in self.coins:
             coin.update()
         self.count += 1/self.period
@@ -54,7 +52,7 @@ class CoinManager(pg.sprite.Sprite):
             self.coins.pop(0)
         self.check_collected()
 
-    def check_collected(self):
+    def check_collected(self) -> None:
         for i, coin in enumerate(self.coins):
             if coin.physics is not None:
                 if not coin.shape.activated:
@@ -67,7 +65,7 @@ class CoinManager(pg.sprite.Sprite):
                     self.coins.pop(i)
                 pass
 
-    def generate(self, floor):
+    def generate(self, floor: Floor) -> None:
         coin_x = floor.body.position.x
         coin_y = floor.body.position.y
         length = floor.length
@@ -92,7 +90,7 @@ class CoinManager(pg.sprite.Sprite):
         floor.marked = True
         pass
 
-    def draw(self):
+    def draw(self) -> None:
         if self.ss:
             for coin in self.coins:
                 if round(self.count + coin.phase) > (IDLE_ANIM_SIZE - 1):
@@ -129,7 +127,7 @@ class CoinManager(pg.sprite.Sprite):
                         f'Counter must be between 0 and {COLLECTED_ANIM_SIZE - 1}, was {counter}'
                     self.draw_collected(coin)
 
-    def draw_collected(self, coin):
+    def draw_collected(self, coin: Coin) -> None:
         width1 = (((coin.collected_counter + DIMENSIONS[0] / 4) / 100) * DIMENSIONS[0] / 2)
         width2 = DIMENSIONS[0] / 4 + DIMENSIONS[0] / 2 - (coin.collected_counter / 200) * (
                     DIMENSIONS[0] / 4 + DIMENSIONS[0] / 2)

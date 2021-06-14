@@ -5,10 +5,11 @@ from pymunk import Poly
 from settings.FLOORS import *
 import settings.FLOORS as FLOORS
 import pygame
+from typing import Union, Tuple
 
 
 class Platform(Floor):
-    def __init__(self, position, angle, length, width, **kwargs):
+    def __init__(self, position: Union[Vec, Tuple[float, float]], angle: float, length: float, width: int, **kwargs):
         """
         :type game: game.Game
         :type position: pymunk.Vec2d
@@ -24,7 +25,7 @@ class Platform(Floor):
         self.slope = self.length/self.height
         self.eq = lambda x: self.slope*x
 
-    def draw(self):
+    def draw(self) -> None:
         vertices = [vertice + self.body.position - self.game.camera.position for vertice in self.vertices]
         pygame.draw.polygon(self.game.screen, self.color, vertices, self.width)
         # pygame.draw.lines(self.game.screen, self.color, closed=True, points=vertices, width=4)
