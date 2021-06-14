@@ -31,6 +31,7 @@ class Parabola(Floor):
         self.width = width
         self.height = height
         self.fill = FILL
+        self.texture_manager = self.game.texture_manager
         if up:
             self.eq = lambda x: self.a * (x ** 2)
 
@@ -38,13 +39,13 @@ class Parabola(Floor):
             self.eq = lambda x: self.a * ((x - self.length) ** 2) + self.height
 
     def draw(self):
-        offset = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
+        offset = self.body.position*self.game.zoom - self.game.camera.position + self.game.displacement
         for group, tex in ((self.points, 'ground'), (self.grass, 'grass')):
-            points = [(p + self.body.position)*self.game.zoom - self.game.camera + self.game.displacement
+            points = [(p + self.body.position)*self.game.zoom - self.game.camera.position + self.game.displacement
                       for p in group]
             try:
                 pygame.gfxdraw.textured_polygon(self.game.screen, points,
-                                                scale(self.game.textures[tex], zoom=self.game.zoom),
+                                                scale(self.texture_manager.textures[tex], zoom=self.game.zoom),
                                                 round(offset.x), -round(offset.y))
             except pygame.error:
                 pass
@@ -65,22 +66,23 @@ class ParabolaUp(Floor):
         self.width = width
         self.height = height
         self.fill = FILL
+        self.texture_manager = self.game.texture_manager
         self.eq = lambda x: self.a*(x**2)
 
     def draw(self):
-        points = [(p + self.body.position)*self.game.zoom - self.game.camera + self.game.displacement
+        points = [(p + self.body.position)*self.game.zoom - self.game.camera.position + self.game.displacement
                   for p in self.points]
-        offset = self.body.position*self.game.zoom - self.game.camera
+        offset = self.body.position*self.game.zoom - self.game.camera.position
         try:
-            pygame.gfxdraw.textured_polygon(self.game.screen, points, self.game.textures['ground'], round(offset.x),
-                                            -round(offset.y))
+            pygame.gfxdraw.textured_polygon(self.game.screen, points, self.texture_manager.textures['ground'],
+                                            round(offset.x), -round(offset.y))
         except pygame.error:
             pass
-        points = [(vertice + self.body.position)*self.game.zoom - self.game.camera + self.game.displacement
+        points = [(vertice + self.body.position)*self.game.zoom - self.game.camera.position + self.game.displacement
                   for vertice in self.grass]
         try:
-            pygame.gfxdraw.textured_polygon(self.game.screen, points, self.game.textures['grass'], round(offset.x),
-                                            -round(offset.y))
+            pygame.gfxdraw.textured_polygon(self.game.screen, points, self.texture_manager.textures['grass'],
+                                            round(offset.x), -round(offset.y))
         except pygame.error:
             pass
 
@@ -101,21 +103,22 @@ class ParabolaDown(Floor):
         self.width = width
         self.height = height
         self.fill = FILL
+        self.texture_manager = self.game.texture_manager
         self.eq = lambda x: self.a*((x - self.length)**2) + self.height
 
     def draw(self):
-        points = [(p + self.body.position)*self.game.zoom - self.game.camera + self.game.displacement
+        points = [(p + self.body.position)*self.game.zoom - self.game.camera.position + self.game.displacement
                   for p in self.points]
-        offset = self.body.position*self.game.zoom - self.game.camera
+        offset = self.body.position*self.game.zoom - self.game.camera.position
         try:
-            pygame.gfxdraw.textured_polygon(self.game.screen, points, self.game.textures['ground'], round(offset.x),
-                                            -round(offset.y))
+            pygame.gfxdraw.textured_polygon(self.game.screen, points, self.texture_manager.textures['ground'],
+                                            round(offset.x), -round(offset.y))
         except pygame.error:
             pass
-        points = [(vertice + self.body.position)*self.game.zoom - self.game.camera + self.game.displacement
+        points = [(vertice + self.body.position)*self.game.zoom - self.game.camera.position + self.game.displacement
                   for vertice in self.grass]
         try:
-            pygame.gfxdraw.textured_polygon(self.game.screen, points, self.game.textures['grass'], round(offset.x),
-                                            -round(offset.y))
+            pygame.gfxdraw.textured_polygon(self.game.screen, points, self.texture_manager.textures['grass'],
+                                            round(offset.x), -round(offset.y))
         except pygame.error:
             pass

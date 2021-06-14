@@ -17,10 +17,58 @@ var2 = []
 var3 = []
 
 
+# TODO: Continue refactoring this
 class Game(GameProperties):
     def __init__(self):
         super().__init__()
+        self.initialize_pygame()
 
+        self.texture_manager = TextureManager()
+        self.texture_manager.add()
+
+        self.texture_manager.add(('ground', TEXTURES.GROUND), ('grass', TEXTURES.GRASS))
+
+        self.data_manager = JsonManager(DATA)
+        self.data = self.data_manager.load()
+
+        self.font = pg_ft.Font(JOYSTIX)
+        self.text_manager = TextManager(self.font)
+        self.text_manager.bulk_adding(*TEXT)
+        self.text_manager.set_text_update(self.text_update)
+
+        self.camera = Camera(self, CAMERA_FOCUS)
+
+        self.draw_options = pk.pygame_util.DrawOptions(self.screen)
+        self.physics = Physics(self)
+        self.physics.start_space(gravity=GRAVITY)
+
+        self.initialize_sprites()
+        self.initialize_screens()
+
+    def initialize_screens(self):
+        self.start_screen = StartScreen(self)
+        self.store_screen = StoreScreen(self)
+        self.go_screen = GoScreen(self)
+
+    def initialize_sprites(self):
+        # TODO: create a cool foreground
+        # self.foreground = Foreground(self)
+        self.backwheel = BackWheel(self, self.physics, costume=self.data['costumes']['backwheel'])
+        self.frontwheel = FrontWheel(self, self.physics, costume=self.data['costumes']['frontwheel'])
+        # print(self.data['costumes']['board'])
+        self.board = Board(self, self.physics, self.backwheel, self.frontwheel, costume=self.data['costumes']['board'])
+        self.floors_manager = FloorsManager(self, self.physics)
+        self.coin_manager = CoinManager(self, self.physics, period=1.5)
+        self.background = Background(self)
+        self.simple_coin = SimpleCoin(self, self.text_manager.text[1].rect.topleft,
+                                      images=self.coin_manager.idle_images)
+
+        self.all_sprites = SpriteGroup()
+        self.all_sprites.add(self.background, self.floors_manager, self.coin_manager, self.simple_coin, self.backwheel,
+                             self.frontwheel, self.board)  # ,self.foreground)
+        # self.mouse_coins = []
+
+    def initialize_pygame(self):
         pg.init()
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -31,43 +79,7 @@ class Game(GameProperties):
         pg.display.set_caption(TITLE)
         pg.display.set_icon(pg.image.load(ICON))
 
-        self.textures = {'ground': pg.image.load(TEXTURES.GROUND).convert(),
-                         'grass': pg.image.load(TEXTURES.GRASS).convert()}
-        self.textures['ground'].set_colorkey((255, 255, 255))
-        self.textures['grass'].set_colorkey((255, 255, 255))
-
-        self.data_manager = JsonManager(DATA)
-        self.data = self.data_manager.load()
-        self.font = pg_ft.Font(JOYSTIX)
-        self.text_manager = TextManager(self.font)
-        self.text_manager.bulk_adding(*TEXT)
-        self.text_manager.set_text_update(self.text_update)
-
-        self.camera = Camera(self, CAMERA_FOCUS)
-
-        self.draw_options = pk.pygame_util.DrawOptions(self.screen)
         self.clock = pg.time.Clock()
-        self.physics = Physics(self)
-        self.physics.start_space(gravity=GRAVITY)
-        self.backwheel = BackWheel(self, self.physics, costume=self.data['costumes']['backwheel'])
-        self.frontwheel = FrontWheel(self, self.physics, costume=self.data['costumes']['frontwheel'])
-        # print(self.data['costumes']['board'])
-        self.board = Board(self, self.physics, self.backwheel, self.frontwheel, costume=self.data['costumes']['board'])
-        self.floors = FloorsManager(self, self.physics)
-        self.coin_manager = CoinManager(self, self.physics, period=1.5)
-        self.background = Background(self)
-        self.simple_coin = SimpleCoin(self, self.text_manager.text[1].rect.topleft,
-                                      images=self.coin_manager.idle_images)
-        # TODO: create a cool foreground
-        # self.foreground = Foreground(self)
-        self.all_sprites = SpriteGroup()
-        self.all_sprites.add(self.background, self.floors, self.coin_manager, self.simple_coin, self.backwheel,
-                             self.frontwheel, self.board)  # ,self.foreground)
-        self.start_screen = StartScreen(self)
-        self.store_screen = StoreScreen(self)
-        self.go_screen = GoScreen(self)
-
-        # self.mouse_coins = []
 
     def new(self):
         # Start a new game

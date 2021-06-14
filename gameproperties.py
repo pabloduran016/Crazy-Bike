@@ -23,16 +23,24 @@ class GameProperties:
     camera_focus: Vec
     scroll: Vec = Vec(0, 0)
 
+    all_sprites: SpriteGroup
     backwheel: BackWheel
     frontwheel: FrontWheel
     board: Board
+    background: Background
 
     current_screen: str
+    screen: pg.Surface
+    loading_screen: pg.Surface
+    start_screen: StartScreen
+    go_screen: GoScreen
+    store_screen: StoreScreen
 
     floors_manager: FloorsManager
     coin_manager: CoinManager
     text_manager: TextManager
     data_manager: JsonManager
+    texture_manager: TextureManager
     data: dict
 
     simple_coin: SimpleCoin
@@ -95,7 +103,7 @@ class GameProperties:
     @zoom.setter
     def zoom(self, value):
         self._zoom = value
-        self.displacement = self.camera_focus * (1 - self._zoom)
+        self.displacement = self.camera.focus * (1 - self._zoom)
         self.text_manager.text[3].rect = self.font.get_rect(text=f"ZOOM {self.zoom * 100:.0f}", size=ZOOM_SIZE)
         self.text_manager.text[3].formating = self.zoom * 100
         self.text_manager.text[3].rect.topright = ZOOM_topright
@@ -168,4 +176,4 @@ class GameProperties:
         self.points_size = POINTS_SIZE
         self.crushed = False
         self.scroll = Vec(0, 0)
-        self.camera = Vec(0, 0)
+        self.camera.reset()

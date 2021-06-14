@@ -20,7 +20,7 @@ class HorizontalPlatform(Floor):
         self.eq = lambda x: 0
 
     def draw(self):
-        vertices = [vertice + self.body.position - self.game.camera for vertice in self.vertices]
+        vertices = [vertice + self.body.position - self.game.camera.position for vertice in self.vertices]
         pygame.draw.polygon(self.game.screen, self.color, vertices, self.fill)
         # pygame.draw.lines(self.game.screen, self.color, closed=True, points=vertices, width=4)
         pass

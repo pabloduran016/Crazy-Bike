@@ -36,3 +36,4 @@ class Physics:
             if hasattr(shape, 'activated'):
                 shape.activated = False
                 self.game.coins_collected += 1
+        return True

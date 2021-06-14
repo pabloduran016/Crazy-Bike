@@ -27,16 +27,17 @@ class Line(Floor):
         self.grass = [Vec(0, 0), self.lastpoint - position, self.lastpoint - position + Vec(0, 20),
                          Vec(0, 20)]
         self.slope = self.height/self.length
+        self.texture_manager = self.game.texture_manager
         self.eq = lambda p: self.slope*p
 
     def draw(self):
-        offset = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
+        offset = self.body.position*self.game.zoom - self.game.camera.position + self.game.displacement
         for group, tex in ((self.vertices, 'ground'), (self.grass, 'grass')):
-            points = [(p + self.body.position) * self.game.zoom - self.game.camera + self.game.displacement
+            points = [(p + self.body.position) * self.game.zoom - self.game.camera.position + self.game.displacement
                       for p in group]
             try:
                 pygame.gfxdraw.textured_polygon(self.game.screen, points,
-                                                scale(self.game.textures[tex], zoom=self.game.zoom),
+                                                scale(self.texture_manager.textures[tex], zoom=self.game.zoom),
                                                 round(offset.x), -round(offset.y))
             except pygame.error:
                 pass

@@ -24,16 +24,17 @@ class HorizontalLine(Floor):
         self.vertices = [Vec(0, 20), Vec(length, 20), Vec(length, width), Vec(0, width)]
         self.grass = [Vec(0, 0), Vec(length, 0), Vec(length, 20), Vec(0, 20)]
         self.slope = 0
+        self.texture_manager = self.game.texture_manager
         self.eq = lambda x: 0
 
     def draw(self):
-        offset = self.body.position*self.game.zoom - self.game.camera + self.game.displacement
+        offset = self.body.position*self.game.zoom - self.game.camera.position + self.game.displacement
         for group, tex in ((self.vertices, 'ground'), (self.grass, 'grass')):
-            points = [(p + self.body.position) * self.game.zoom - self.game.camera + self.game.displacement
+            points = [(p + self.body.position) * self.game.zoom - self.game.camera.position + self.game.displacement
                       for p in group]
             try:
                 pygame.gfxdraw.textured_polygon(self.game.screen, points,
-                                                scale(self.game.textures[tex], zoom=self.game.zoom),
+                                                scale(self.texture_manager.textures[tex], zoom=self.game.zoom),
                                                 round(offset.x), -round(offset.y))
             except pygame.error:
                 pass

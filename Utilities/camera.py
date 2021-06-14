@@ -43,3 +43,6 @@ class Camera:
         self.game.scroll += (scroll.x / SCROLL_DIVIDER[0], scroll.y / SCROLL_DIVIDER[1])
         self.distance = abs(self.game.backwheel.body.position.x / 5000)
         # TODO: add smooth zooming when going at high speeds
+
+    def reset(self):
+        self.position = Vec(0, 0)

@@ -25,6 +25,6 @@ class Platform(Floor):
         self.eq = lambda x: self.slope*x
 
     def draw(self):
-        vertices = [vertice + self.body.position - self.game.camera for vertice in self.vertices]
+        vertices = [vertice + self.body.position - self.game.camera.position for vertice in self.vertices]
         pygame.draw.polygon(self.game.screen, self.color, vertices, self.width)
         # pygame.draw.lines(self.game.screen, self.color, closed=True, points=vertices, width=4)

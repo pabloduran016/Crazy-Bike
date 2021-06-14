@@ -112,7 +112,7 @@ class CoinManager(pg.sprite.Sprite):
                     assert 0 <= counter <= IDLE_ANIM_SIZE - 1, \
                         f'Counter must be between 0 and {IDLE_ANIM_SIZE - 1}, was {counter}'
                     pos = (coin.body.position - Vec(*self.rect.center) + coin.displacement)*self.game.zoom \
-                          - self.game.camera + self.game.displacement
+                          - self.game.camera.position + self.game.displacement
                     self.game.screen.blit(scale(self.idle_images[counter], original_dimensions=DIMENSIONS,
                                                     zoom=self.game.zoom), pos)
                 else:
@@ -136,6 +136,6 @@ class CoinManager(pg.sprite.Sprite):
                                    rect.center, width2)
                     rect.center = coin.body.position + coin.displacement
                     pos = (coin.body.position + coin.displacement) * self.game.zoom \
-                          - self.game.camera + self.game.displacement
+                          - self.game.camera.position + self.game.displacement
                     rect.center = pos
                     self.game.screen.blit(image, rect)

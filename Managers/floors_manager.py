@@ -36,7 +36,7 @@ class FloorsManager(pygame.sprite.Sprite):
         except IndexError:
             print(self.all)
             raise
-        distance = (lastfloor.body.position*self.game.zoom - self.game.camera).length
+        distance = (lastfloor.body.position*self.game.zoom - self.game.camera.position).length
         while distance < 3000*self.game.zoom:
             # self.all.append(HorizontalLine(game=self.game, position=lastfloor.lastpoint,
             #                                length=800, width=WIDTH))
