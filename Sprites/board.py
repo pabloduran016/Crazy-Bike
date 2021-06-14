@@ -1,13 +1,23 @@
 import pygame.image
 from Utilities import pivotjoint, scale, blitrotate
 from settings.BOARD import *
-import pymunk.vec2d
+from pymunk import Vec2d as Vec
+import pymunk
 # from game import Physics
-vec = pymunk.Vec2d
 
 
 class Board(pygame.sprite.Sprite):
-    def __init__(self, game, physics, body_a, body_b, costume='bike'):
+    available_costumes: set
+    pivot: Vec
+    dimensions: tuple
+    body: pymunk.Body
+    shape: pymunk.Shape
+    joint1: pymunk.Constraint
+    joint2: pymunk.Constraint
+    handler: pymunk.CollisionHandler
+    angle: float
+
+    def __init__(self, game, physics, body_a, body_b, costume: str = 'bike'):
         """
         :type game: game.Game
         :param body_a First Body you want to attach
@@ -20,38 +30,23 @@ class Board(pygame.sprite.Sprite):
         self.physics = physics
         self.color = COLOR
         self.thetaacc = THETAACC
-        # Spring
+        self.load_images(costume)
         self.body_a = body_a
         self.body_b = body_b
-        self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
-        self.available_costumes = COSTUMES.keys()
-        self.pivot = vec(*COSTUMES[costume]['pivot'])
-        self.dimensions = COSTUMES[costume]['dimensions']
-        self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(vec(1, 0))
         # Pymunk Body for the board
-        self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
-        self.body.position = self.body_a.body.position
-        self.shape = pymunk.Poly(self.body, VERICES)
-        self.shape.density = DENSITY
-        self.shape.friction = FRICTION
-        self.shape.color = self.color
-        self.shape.elasticity = ELASTICITY
-        self.shape.collision_type = 2
-        self.shape.filter = pymunk.ShapeFilter(group=2)
-        self.physics.add(self.body, self.shape)
-        self.joint1 = pivotjoint(self.body, self.body_a.body)
-        self.joint1.collide_bodies = False
-        self.joint2 = pivotjoint(self.body, self.body_b.body, a=self.body_b.body.position - self.body.position)
-        self.joint2.collide_bodies = False
-        self.physics.add(self.joint1, self.joint2)
-        self.checkground = 1
-        self.handler = self.physics.space.add_collision_handler(2, 3)
-        self.handler.begin = self.check_ground_begin
+        self.load_physics()
         self.flipped = False
         self.costume = costume
+        self.checkground = 1
 
-    def reset(self):
-        self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(vec(1, 0))
+    def load_images(self, costume: str) -> None:
+        self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
+        self.available_costumes = COSTUMES.keys()
+        self.pivot = Vec(*COSTUMES[costume]['pivot'])
+        self.dimensions = COSTUMES[costume]['dimensions']
+
+    def load_physics(self):
+        self.angle = (self.body_b.body.position - self.body_a.body.position).get_angle_degrees_between(Vec(1, 0))
         self.body = pymunk.Body(body_type=pymunk.Body.DYNAMIC)
         self.body.position = self.body_a.body.position
         self.shape = pymunk.Poly(self.body, VERICES)
@@ -67,9 +62,12 @@ class Board(pygame.sprite.Sprite):
         self.joint2 = pivotjoint(self.body, self.body_b.body, a=self.body_b.body.position - self.body.position)
         self.joint2.collide_bodies = False
         self.physics.add(self.joint1, self.joint2)
-        self.checkground = 1
         self.handler = self.physics.space.add_collision_handler(2, 3)
         self.handler.begin = self.check_ground_begin
+
+    def reset(self):
+        self.load_physics()
+        self.checkground = 1
         self.flipped = False
 
     def next_costume(self) -> str:
@@ -84,7 +82,7 @@ class Board(pygame.sprite.Sprite):
             if costume != self.costume:
                 self.costume = costume
                 self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
-                self.pivot = vec(*COSTUMES[costume]['pivot'])
+                self.pivot = Vec(*COSTUMES[costume]['pivot'])
                 self.dimensions = COSTUMES[costume]['dimensions']
         else:
             raise ValueError(f'Costume {costume} not known')
@@ -93,7 +91,7 @@ class Board(pygame.sprite.Sprite):
         if not self.game.crushed:
             self.body.angular_velocity *= AIR_DRAG_MULTIPLIER
             self.angle = round((self.body_b.body.position -
-                                self.body_a.body.position).get_angle_degrees_between(vec(1, 0)))
+                                self.body_a.body.position).get_angle_degrees_between(Vec(1, 0)))
             if -100 < self.angle < -80 and not self.flipped:
                 self.game.flips += 1
                 self.flipped = True
@@ -129,16 +127,16 @@ class SimpleBoard:
     def __init__(self, position, costume):
         self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
         self.available_costumes = COSTUMES.keys()
-        self.pivot = vec(*COSTUMES[costume]['pivot'])
+        self.pivot = Vec(*COSTUMES[costume]['pivot'])
         self.dimensions = COSTUMES[costume]['dimensions']
         self.costume = costume
-        self.position = vec(*position)
+        self.position = Vec(*position)
         self.rect = self.image.get_rect()
         self.rect.topleft = position - self.pivot
         # self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
         # self.dimensions = dimensions
         # self.rect = pygame.Rect(0, 0, *dimensions)
-        # self.pivot = vec(*COSTUMES[costume]['pivot'])
+        # self.pivot = Vec(*COSTUMES[costume]['pivot'])
         # self.rect.center =  - self.pivot + position
         # self.available_costumes = COSTUMES.keys()
 
@@ -156,7 +154,7 @@ class SimpleBoard:
             if costume != self.costume:
                 self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
                 self.available_costumes = COSTUMES.keys()
-                self.pivot = vec(*COSTUMES[costume]['pivot'])
+                self.pivot = Vec(*COSTUMES[costume]['pivot'])
                 self.dimensions = COSTUMES[costume]['dimensions']
                 self.costume = costume
                 self.rect = self.image.get_rect()

@@ -20,7 +20,7 @@ class Background(pygame.sprite.Sprite):
     def update(self):
         pass
 
-    def draw(self):
+    def draw(self) -> None:
         # SKY
         cam = self.game.camera.position * self.sky_multiplier
         x = int(cam.x / self.rect.width)
