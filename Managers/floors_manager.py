@@ -1,11 +1,10 @@
 import pygame.draw
-import pymunk
+from pymunk import Vec2d as Vec
 from Floors import *
 from settings.FLOORS import *
 from random import randint
-from typing import List
+from typing import List, Union, Tuple
 # from game import Physics
-vec = pymunk.Vec2d
 
 
 class FloorsManager(pygame.sprite.Sprite):
@@ -22,9 +21,9 @@ class FloorsManager(pygame.sprite.Sprite):
         self.all = []
 
     def start(self):
-        self.all.append(HorizontalLine(game=self.game, physics=self.physics, position=vec(*INITIALPOS), length=800,
+        self.all.append(HorizontalLine(game=self.game, physics=self.physics, position=Vec(*INITIALPOS), length=800,
                                        width=WIDTH))
-        self.create_horizontalline(vec(*INITIALPOS), 800)
+        self.create_horizontalline(Vec(*INITIALPOS), 800)
 
     def update(self):
         lastfloor: Floor = self.all[-1]
@@ -47,12 +46,12 @@ class FloorsManager(pygame.sprite.Sprite):
         while len(self.all) > 30:
             self.all.pop(0)
 
-    def create_horizontalline(self, position, length):
+    def create_horizontalline(self, position: Union[Vec, Tuple[float, float]], length: int) -> None:
         self.all.append(
             HorizontalLine(game=self.game, physics=self.physics, position=position, length=length,
                            width=WIDTH))
 
-    def create_parabola(self, position, length):
+    def create_parabola(self, position: Union[Vec, Tuple[float, float]], length: int) -> None:
         if len(self.all) > 2:
             h = randint(-400, 800)
             if h + self.all[-2].lastpoint.y > INITIALPOS[1]:  # If you go down, do you reach de bottom?
@@ -72,7 +71,7 @@ class FloorsManager(pygame.sprite.Sprite):
             self.all.append(Parabola(game=self.game, physics=self.physics, position=position,
                                      length=length, height=h, width=WIDTH, up=True))
 
-    def create_line(self, position, length):
+    def create_line(self, position: Union[Vec, Tuple[float, float]], length: int) -> None:
         if len(self.all) > 2:  # LINE
             h = randint(-60 * length, 80 * length) / 100
             if h + self.all[-2].lastpoint.y > INITIALPOS[1]:  # If you go down, do you reach de bottom?
@@ -80,7 +79,7 @@ class FloorsManager(pygame.sprite.Sprite):
         else:
             h = randint(-60 * length, 0) / 100
         self.all.append(Line(game=self.game, physics=self.physics, position=position,
-                             final_pos=position + vec(length, h), width=WIDTH))
+                             final_pos=position + Vec(length, h), width=WIDTH))
 
     def draw(self):
         for floor in self.all:
