@@ -16,29 +16,26 @@ class Floor(ABC):
         self.color = subclass.COLOR
         self.body = Body(body_type=Body.STATIC)
         self.body.position = position
+        self.physics.add(self.body)
         if isinstance(shape, pymunk.Shape):
-            self.shape = shape
-            self.shape.body = self.body
-            self.shape.friction = subclass.FRICTION
-            self.shape.color = self.color
-            self.shape.elasticity = ELASTICITY
-            self.shape.collision_type = 3
-            self.physics.add(self.body, self.shape)
+            self.shape = self.add_shape(shape, subclass)
         elif type(shape) == list:
-            self.shape = []
-            self.physics.add(self.body)
-            for s in shape:
-                s.body = self.body
-                s.friction = subclass.FRICTION
-                s.color = self.color
-                s.collision_type = 3
-                s.elasticity = ELASTICITY
-                self.shape.append(s)
-                self.physics.add(s)
+            self.shape = [self.add_shape(s, subclass) for s in shape]
+
         self.lastpoint = Vec(0, 0)
         self.eq = None
         self.length = None
         self.marcked = False
+
+    def add_shape(self, shape, subclass):
+        s = shape
+        s.body = self.body
+        s.friction = subclass.FRICTION
+        s.color = self.color
+        s.elasticity = ELASTICITY
+        s.collision_type = 3
+        self.physics.add(s)
+        return s
 
     def update(self):
         pass
