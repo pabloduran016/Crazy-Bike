@@ -1,8 +1,10 @@
-import pymunk.constraints
-import pymunk.vec2d
+import pymunk
+from pymunk import Vec2d as Vec
+from typing import Union, Tuple
 
 
-def pinjoint(b_a, b_b, a=None, b=None):
+def pinjoint(b_a: pymunk.Body, b_b: pymunk.Body, a: Union[Tuple[float, float], Vec] = None,
+             b: Union[Tuple[float, float], Vec] = None) -> pymunk.PinJoint:
     """
     :param b_a: First Body you want to attach
     :type b_a: pymunk.Body
@@ -28,7 +30,8 @@ def pinjoint(b_a, b_b, a=None, b=None):
     return joint
 
 
-def pivotjoint(b_a, b_b, a=None, b=None):
+def pivotjoint(b_a: pymunk.Body, b_b: pymunk.Body, a: Union[Tuple[float, float], Vec] = None,
+               b: Union[Tuple[float, float], Vec] = None) -> pymunk.PivotJoint:
     """
     :param b_a: First Body you want to attach
     :type b_a: pymunk.Body

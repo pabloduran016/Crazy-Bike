@@ -1,14 +1,16 @@
 import pygame as pg
 from math import pi, exp
 from pymunk import Vec2d as Vec
-from typing import Union
+from typing import Union, Tuple
 # import rsvgwrapper
 # import cairo
 # from PIL import Image
 # import numpy
 
 
-def blitrotate(image, pos, originpos, angle):
+def blitrotate(image: Union[pg.Surface, pg.SurfaceType], pos: Union[Tuple[float, float], Vec],
+               originpos: Union[Tuple[float, float], Vec],
+               angle: float) -> Tuple[Union[pg.Surface, pg.SurfaceType], Union[Tuple[float, float], Vec]]:
     """
     :param image: the Surface which has to be rotated and blit
     :param pos: the position of the pivot on the target Surface surf (relative to the top left of surf)
@@ -37,12 +39,13 @@ def blitrotate(image, pos, originpos, angle):
     return rotated_image, origin
 
 
-def scale(img, original_dimensions=None, zoom=1):
+def scale(img: Union[pg.Surface, pg.SurfaceType], original_dimensions: Tuple[int, int] = None,
+          zoom: float = 1) -> Union[pg.Surface, pg.SurfaceType]:
     dim = original_dimensions if original_dimensions is not None else img.get_rect().size
     return pg.transform.scale(img, (round(dim[0]*zoom), round(dim[1]*zoom)))
 
 
-def formated(original: str, value: Union[str, float]):
+def formated(original: str, value: Union[str, float]) -> str:
     if value is None:
         return original
     else:
@@ -54,11 +57,11 @@ def formated(original: str, value: Union[str, float]):
             return original
 
 
-def rad_to_degrees(angle):
+def rad_to_degrees(angle: float) -> float:
     return angle*180/pi
 
 
-def normalize(x):
+def normalize(x: float) -> float:
     return 1 / (1 + exp(-x + 5))
 
 
