@@ -17,9 +17,10 @@ class Camera:
         if not self.game.crushed:
             self.move()
         elif self.game.go_counter < 100:
+            # print('death_Cam')
             self.death_cam()
         else:
-            self.playing = False
+            self.game.playing = False
         self.position = Vec(*self.game.scroll)
         self.apply_camera_shake()
 
@@ -34,14 +35,14 @@ class Camera:
         self.game.zoom += 0.003
         self.game.scroll += (scale(self.game.board.image, self.game.board.dimensions,
                                    self.game.zoom).get_rect().center +
-                        self.game.board.body.position * self.game.zoom - self.game.scroll - self.focus * self.game.zoom)
+                   self.game.board.body.position * self.game.zoom - self.game.scroll - self.focus * self.game.zoom)
         self.game.go_counter += 1
 
     def move(self):
         scroll = scale(self.game.board.image, self.game.board.dimensions, self.game.zoom).get_rect().center + \
                  self.game.board.body.position * self.game.zoom - self.game.scroll - self.focus * self.game.zoom
         self.game.scroll += (scroll.x / SCROLL_DIVIDER[0], scroll.y / SCROLL_DIVIDER[1])
-        self.distance = abs(self.game.backwheel.body.position.x / 5000)
+        self.game.distance = abs(self.game.backwheel.body.position.x / 5000)
         # TODO: add smooth zooming when going at high speeds
 
     def reset(self):

@@ -24,7 +24,7 @@ class Physics:
             self.space.add(obj)
 
     def reset(self):
-        self.start_space(self.gravity)
+        self.start_space(gravity=self.gravity)
 
     def remove(self, *args: Union[pk.Shape, pk.Body, pk.Constraint]):
         for obj in args:

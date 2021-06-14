@@ -105,7 +105,7 @@ class Board(pygame.sprite.Sprite):
                 self.game.physics.remove(con)
             # im, pos = blitrotate(self.image, self.body.position - self.game.camera.position, self.pivot, self.angle)
             # self.game.screen.blit(im, pos)
-            self.game.physics.gravity = (0, 0)
+            self.game.physics.space.gravity = (0, 0)
             self.body.velocity = (0, 0)
             self.body.angular_velocity = 0
             self.shape.sensor = True
