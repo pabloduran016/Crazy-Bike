@@ -1,17 +1,7 @@
-IMAGE = 'Assets/Images/startscreen3.png'
-CB_SIZE = 70
-CB_center = 450, 100
-STORE_SIZE = 50
-STORE_center = 450, 170
-SPACE_SIZE = 20
-SPACE_center = 450, 800
-M_SIZE = 20
-M_center = 450, 850
-COINS_SIZE = 20
-COINS_topright = 880, 20
-NEC_SIZE = 20
-NEC_center = 450, 700
+from .colors import *
 
+IMAGE = 'Assets/Images/startscreen3.png'
+ANIMATION_SIZE = 2
 ITEM_DIMENSIONS = 200, 175
 ITEM_IMAGE_DIMENSIONS = 50
 ITEM_SPACING = (20, 15)
@@ -25,6 +15,15 @@ ITEMS = [
     ['CAR BOARD', 15, (0, 1), 'Assets/Images/Player_costumes/car_board.png', 400, 'board'],
 ]
 
+TEXT = (
+    ('CRAZY BIKE', BLACK, 70, True, None, {'center': (450, 100)}),
+    ('STORE', BLACK, 50, True, None, {'center': (450, 170)}),
+    ('PRESS SPACE TO START', BLACK, 20, True, None, {'center': (450, 800)}),
+    ('RESS M TO RETURN TO MENU', BLACK, 20, True, None, {'center': (450, 850)}),
+    ('{}', BLACK, 20, True, 0, {'topright': (880, 20)}),
+    ("HIGH SCORE: {}", BLACK, 20, True, None, {'top': 20, 'centerx': 450}),
+    ("NOT ENOUGH COINS", RED, 20, True, None, {'center': (450, 700)}),
+)
 BACKWHEEL_POSITION = (225, 650)
 WHEELS_DIMENSIONS = 40, 40
 WHEELS_DISTANCE = 90 * WHEELS_DIMENSIONS[0]/40

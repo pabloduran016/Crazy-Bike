@@ -1,11 +1,13 @@
 from settings import *
-from pymunk import Vec2d as Vec
-from Managers import *
-import pygame as pg
-from Sprites import *
-from Utilities import *
-import pygame.freetype as pg_ft
 from settings.TEXT import *
+from Utilities import Camera
+from Sprites import SpriteGroup, Background, SimpleCoin
+from Managers import TextManager, CoinManager, TextureManager, FloorsManager, JsonManager
+from Player import BackWheel, FrontWheel, Board
+from Screens import StartScreen, StoreScreen, GoScreen
+from pymunk import Vec2d as Vec
+import pygame as pg
+import pygame.freetype as pg_ft
 
 
 class GameProperties:
@@ -29,7 +31,7 @@ class GameProperties:
     board: Board
     background: Background
 
-    current_screen: str
+    current_screen: str = ''
     screen: pg.Surface
     loading_screen: pg.Surface
     start_screen: StartScreen

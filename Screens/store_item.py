@@ -7,7 +7,7 @@ from typing import Tuple, Union
 
 
 class StoreItem:
-    def __init__(self, font: pg.Font, text: str, size: int, price: int, dimensions: Tuple[int, int],
+    def __init__(self, font: pg.freetype.Font, text: str, size: int, price: int, dimensions: Tuple[int, int],
                  image: Union[pg.Surface, pg.SurfaceType],
                  texture: Union[pg.Surface, pg.SurfaceType], obj: str, color=WHITE, **kwargs):
         self.rect = pg.Rect(0, 0, *dimensions)

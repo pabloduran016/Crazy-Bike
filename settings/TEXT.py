@@ -35,12 +35,3 @@ TEXT = (
         # [self.font.get_rect(text=f"Checkground: 0", size=HS_SIZE),
         #      "Checkground: {}", BLACK, HS_SIZE, True, None],
 )
-# self.texts[0][0].topleft = FPS_topleft
-# self.texts[1][0].topright = CC_topright
-# self.texts[2][0].topright = FLIPS_topright
-# self.texts[3][0].topright = ZOOM_topright
-# self.texts[4][0].bottomleft = RULES_bottomleft
-# self.texts[5][0].center = POINTS_center
-# self.texts[6][0].topleft = Vec(*self.texts[5][0].topright) + (20, 0)
-# self.texts[7][0].topright = AT_topright
-# self.texts[8][0].centerx, self.texts[8][0].top = HS_topcenter

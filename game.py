@@ -6,8 +6,10 @@ import pymunk.pygame_util
 from settings import *
 from settings.TEXT import *
 from Managers import *
-from Sprites import *
-from Utilities import *
+from Player import BackWheel, FrontWheel, Board
+from Sprites import SpriteGroup, Background, SimpleCoin, Coin
+from Screens import StoreScreen, StartScreen, GoScreen
+from Utilities import Camera, Physics
 import matplotlib.pylab as plt
 # from math import sin
 from gameproperties import GameProperties
@@ -245,7 +247,7 @@ class Game(GameProperties):
             self.events()
             self.all_sprites.draw()
             self.go_screen.update()
-            self.go_screen.draw(self.screen)
+            self.go_screen.draw()
             pg.display.flip()
         if self.current_screen == 'menu':
             self.show_menu()
