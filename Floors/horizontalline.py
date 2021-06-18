@@ -30,7 +30,7 @@ class HorizontalLine(Floor):
 
     def draw(self) -> None:
         offset = self.body.position*self.game.zoom - self.game.camera.position + self.game.displacement
-        for group, tex in ((self.vertices, 'ground'), (self.grass, 'grass')):
+        for group, tex in ((self.vertices, TEXTURES['ground']), (self.grass, TEXTURES['grass'])):
             points = [(p + self.body.position) * self.game.zoom - self.game.camera.position + self.game.displacement
                       for p in group]
             try:

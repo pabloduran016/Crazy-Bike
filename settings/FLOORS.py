@@ -6,3 +6,5 @@ COLOR = BLUE
 FILL = 0
 FRICTION = 1
 RADIUS = 1
+
+TEXTURES = {'ground': 'soil', 'grass': 'grass_2'}
