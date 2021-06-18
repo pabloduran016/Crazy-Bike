@@ -1,13 +1,17 @@
 from settings.STARTSCREEN import *
+from settings import COIN, FPS
+from pymunk import Vec2d as Vec
 import pygame as pg
 from Managers import TextManager
 from Sprites import SimpleCoin
 from Widgets import Button
 from typing import Union, Tuple, Optional
+from Sprites import Coin
 from Utilities.functions import scale
+from .screen_baseclass import Screen
 
 
-class StartScreen(pg.sprite.Sprite):
+class StartScreen(Screen):
     def __init__(self, game):
         super(StartScreen, self).__init__()
         self.game = game
@@ -29,8 +33,37 @@ class StartScreen(pg.sprite.Sprite):
         self.store_button.bind(self.store_click)
         self.store_button.set_instrucion('draw', self.store_button_draw)
 
+    def __enter__(self):
+        self.reset()
+        self.game.waiting = True
+        self.game.coin_manager.reset(ss=True)
+        self.game.all_sprites.add(self)
+        self.game.coin_manager.coins = [Coin(self.game, position=Vec(x, y), phase=i - (COIN.IDLE_ANIM_SIZE - 1) *
+                                 (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.game.all_sprites.remove(self)
+
+    def setup(self) -> None:
+        self.reset()
+        self.game.waiting = True
+        self.game.coin_manager.reset(ss=True)
+        self.game.all_sprites.add(self)
+        self.game.coin_manager.coins = [Coin(self.game, position=Vec(x, y), phase=i - (COIN.IDLE_ANIM_SIZE - 1) *
+                                 (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
+
+    def run(self) -> None:
+        self.game.events()
+        self.game.screen.fill(WHITE)
+        self.update()
+        self.game.coin_manager.update()
+        self.draw()
+        self.game.coin_manager.draw()
+        pg.display.flip()
+        self.game.clock.tick(FPS)
+
     @staticmethod
-    def store_button_draw(button: Button, screen: Union[pg.Surface, pg.SurfaceType]):
+    def store_button_draw(button: Button, screen: Union[pg.Surface, pg.SurfaceType]) -> None:
         pg.draw.rect(screen, button.color, button.rect)
         pg.draw.rect(screen, BLACK, button.rect, width=4)
         if button.image is not None:
@@ -52,8 +85,8 @@ class StartScreen(pg.sprite.Sprite):
         return self.store_button.mouseclick(mouse)
 
     def store_click(self) -> bool:
-        self.game.current_screen = 'store'
-        self.game.store_screen.text_manager.text[6].visible = False
+        self.game.screens_manager.current_screen = 'store'
+        self.game.screens_manager.store_screen.text_manager.text[6].visible = False
         self.game.waiting = False
         return True
 

@@ -7,8 +7,7 @@ from settings import *
 from settings.TEXT import *
 from Managers import *
 from Player import BackWheel, FrontWheel, Board
-from Sprites import SpriteGroup, Background, SimpleCoin, Coin
-from Screens import StoreScreen, StartScreen, GoScreen
+from Sprites import SpriteGroup, Background, SimpleCoin
 from Utilities import Camera, Physics
 import matplotlib.pylab as plt
 # from math import sin
@@ -19,7 +18,6 @@ var2 = []
 var3 = []
 
 
-# TODO: Continue refactoring this
 class Game(GameProperties):
     def __init__(self):
         super().__init__()
@@ -45,12 +43,7 @@ class Game(GameProperties):
         self.physics.start_space(gravity=GRAVITY)
 
         self.initialize_sprites()
-        self.initialize_screens()
-
-    def initialize_screens(self):
-        self.start_screen = StartScreen(self)
-        self.store_screen = StoreScreen(self)
-        self.go_screen = GoScreen(self)
+        self.screens_manager = ScreensManager(self)
 
     def initialize_sprites(self):
         # TODO: create a cool foreground
@@ -83,40 +76,23 @@ class Game(GameProperties):
 
         self.clock = pg.time.Clock()
 
+    def start(self):
+        self.screens_manager.run()
+
     def new(self):
         # Start a new game
         self.physics.reset()
         self.reset_variables()
         self.all_sprites.reset()
-        self.run()
-
-    def run(self):
-        # Game Loop
-        self.playing = True
-        while self.playing:
-            # if self.clock.get_time() % 4 == 0:
-            self.events()
-            self.draw()
-            self.update()
-            self.clock.tick(FPS)
-        self.update_data()
 
     def update(self):
         # Game Loop - Update
-        # print(self.airtime)
-        # print(self.crushed)
-        # TODO:  fix zooming
-        # self.zoom -= sin(pg.time.get_ticks()*.006)*0.01
         if self.airtime:
             self.airtime += 1
         self.physics.update()
         self.all_sprites.update()
         self.camera.update()
         self.update_fonts()
-        # var.append(self.lasty)
-        # var.append(self.backwheel.body.velocity.y)
-        # var2.append(self.zoom)
-        # var3.append(self.last_vel)
 
     def events(self):
         # Game Loop - events
@@ -125,16 +101,16 @@ class Game(GameProperties):
             if event.type == pg.QUIT:
                 self.update_data()
                 self.running = False
-                self.playing = False
-                self.waiting = False
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.playing = False
                     self.crushed = True
                 if event.key == pg.K_SPACE and self.waiting:
-                    self.change_screen_to('game')
+                    self.waiting = False
+                    self.screens_manager.current_screen = 'playing'
                 if event.key == pg.K_m and self.waiting:
-                    self.change_screen_to('menu')
+                    self.waiting = False
+                    self.screens_manager.current_screen = 'start'
                 if event.key == pg.K_o:
                     self.backwheel.change_costume_to(self.backwheel.next_costume())
                     self.frontwheel.change_costume_to(self.frontwheel.next_costume())
@@ -142,13 +118,9 @@ class Game(GameProperties):
                     self.board.change_costume_to(self.board.next_costume())
             if event.type == pg.MOUSEBUTTONDOWN:
                 captured = self.all_sprites.mouseclick(pg.mouse.get_pos())
-                if pg.mouse.get_pressed(3)[0] and self.waiting and not captured and self.current_screen != 'store':
+                if pg.mouse.get_pressed(3)[0] and self.waiting and not captured:
                     self.waiting = False
         self.check_keys()
-
-    def change_screen_to(self, screen: str):
-        self.waiting = False
-        self.current_screen = screen
 
     def check_keys(self, ):
         keys = pg.key.get_pressed()
@@ -191,66 +163,6 @@ class Game(GameProperties):
         # self.texts[9][5] = self.board.checkground
         self.text_manager.draw(self.screen)
         pg.display.flip()
-
-    def show_store(self):
-        self.store_screen.reset()
-        self.waiting = True
-        self.coin_manager.reset(ss=True)
-        self.all_sprites.add(self.store_screen)
-        while self.waiting:
-            self.events()
-            self.screen.fill(WHITE)
-            self.store_screen.update()
-            self.store_screen.draw()
-            pg.display.flip()
-            self.clock.tick(FPS)
-        self.all_sprites.remove(self.store_screen)
-        if self.current_screen == 'menu':
-            self.show_menu()
-        # print(self.mouse_coins)
-        pass
-
-    def show_start_screen(self):
-        # game splash/start screen
-        self.start_screen.reset()
-        self.waiting = True
-        self.coin_manager.reset(ss=True)
-        self.all_sprites.add(self.start_screen)
-        self.coin_manager.coins = [Coin(self, position=Vec(x, y), phase=i - (COIN.IDLE_ANIM_SIZE - 1) *
-                                        (i // (COIN.IDLE_ANIM_SIZE - 1))) for i, (x, y) in enumerate(COIN.SS_POSITIONS)]
-        while self.waiting:
-            self.events()
-            self.screen.fill(WHITE)
-            self.start_screen.update()
-            self.coin_manager.update()
-            self.start_screen.draw()
-            self.coin_manager.draw()
-            pg.display.flip()
-            self.clock.tick(FPS)
-        self.all_sprites.remove(self.start_screen)
-        if self.current_screen == 'store':
-            self.show_store()
-        # print(self.mouse_coins)
-        pass
-
-    def show_menu(self):
-        # game splash/start screen
-        self.show_start_screen()
-
-    def show_go_screen(self):
-        # GO animation
-        self.waiting = True
-        self.go_screen = GoScreen(self)
-        while self.waiting and self.running:
-            self.clock.tick(FPS)
-            self.update()
-            self.events()
-            self.all_sprites.draw()
-            self.go_screen.update()
-            self.go_screen.draw()
-            pg.display.flip()
-        if self.current_screen == 'menu':
-            self.show_menu()
 
     def update_fonts(self):
         if self.pluspoints_counter:

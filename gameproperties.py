@@ -2,9 +2,8 @@ from settings import *
 from settings.TEXT import *
 from Utilities import Camera
 from Sprites import SpriteGroup, Background, SimpleCoin
-from Managers import TextManager, CoinManager, TextureManager, FloorsManager, JsonManager
+from Managers import TextManager, CoinManager, TextureManager, FloorsManager, JsonManager, ScreensManager
 from Player import BackWheel, FrontWheel, Board
-from Screens import StartScreen, StoreScreen, GoScreen
 from pymunk import Vec2d as Vec
 import pygame as pg
 import pygame.freetype as pg_ft
@@ -31,18 +30,15 @@ class GameProperties:
     board: Board
     background: Background
 
-    current_screen: str = ''
     screen: pg.Surface
     loading_screen: pg.Surface
-    start_screen: StartScreen
-    go_screen: GoScreen
-    store_screen: StoreScreen
 
     floors_manager: FloorsManager
     coin_manager: CoinManager
     text_manager: TextManager
     data_manager: JsonManager
     texture_manager: TextureManager
+    screens_manager: ScreensManager
     data: dict
 
     simple_coin: SimpleCoin

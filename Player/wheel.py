@@ -52,11 +52,13 @@ class Wheel(pygame.sprite.Sprite, ABC):
         self.dimensions = COSTUMES[costume]['dimensions']
 
     def next_costume(self) -> str:
-        costumes = iter(self.available_costumes)
-        costume = next(costumes)
-        while self.costume != costume:
-            costume = next(costumes)
-        return next(costumes)
+        costumes = list(self.available_costumes)
+        for i, costume in enumerate(costumes):
+            if costume == self.costume:
+                if len(costumes) == i + 1:
+                    return costumes[0]
+                else:
+                    return costumes[i + 1]
 
     @abstractmethod
     def get_id(self) -> str:

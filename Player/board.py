@@ -42,6 +42,7 @@ class Board(pygame.sprite.Sprite):
         self.checkground = 1
 
     def load_costume(self, costume: str) -> None:
+        self.costume = costume
         self.game.data['costumes']['board'] = costume
         self.image = pygame.image.load(COSTUMES[costume]['image']).convert_alpha()
         self.pivot = Vec(*COSTUMES[costume]['pivot'])
@@ -73,11 +74,13 @@ class Board(pygame.sprite.Sprite):
         self.flipped = False
 
     def next_costume(self) -> str:
-        costumes = iter(self.available_costumes)
-        costume = next(costumes)
-        while self.costume != costume:
-            costume = next(costumes)
-        return next(costumes)
+        costumes = list(self.available_costumes)
+        for i, costume in enumerate(costumes):
+            if costume == self.costume:
+                if len(costumes) == i + 1:
+                    return costumes[0]
+                else:
+                    return costumes[i + 1]
 
     def change_costume_to(self, costume: str) -> None:
         if costume in self.available_costumes:

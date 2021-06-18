@@ -1,14 +1,16 @@
 from settings.STORESCREEN import *
 import pygame as pg
+from settings import FPS
 from Player import SimpleWheel, SimpleBoard, Wheel, Board
 from typing import List, Union
 from .store_item import StoreItem
 from settings import TEXTURES
 from Sprites import SimpleCoin
 from Managers import TextManager
+from .screen_baseclass import Screen
 
 
-class StoreScreen(pg.sprite.Sprite):
+class StoreScreen(Screen):
     simple_frontwheel: SimpleWheel
     simple_backwheel: SimpleWheel
     simple_board: SimpleBoard
@@ -31,6 +33,29 @@ class StoreScreen(pg.sprite.Sprite):
         self.simple_coin.rect.right = self.text_manager.text[4].rect.left - 30
         self.simple_coin.rect.centery = self.text_manager.text[4].rect.centery
         self.store_items = self.load_items()
+
+    def __enter__(self):
+        self.reset()
+        self.game.waiting = True
+        self.game.coin_manager.reset(ss=True)
+        self.game.all_sprites.add(self)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.game.all_sprites.remove(self)
+
+    def setup(self) -> None:
+        self.reset()
+        self.game.waiting = True
+        self.game.coin_manager.reset(ss=True)
+        self.game.all_sprites.add(self)
+
+    def run(self) -> None:
+        self.game.events()
+        self.game.screen.fill(WHITE)
+        self.update()
+        self.draw()
+        pg.display.flip()
+        self.game.clock.tick(FPS)
 
     def setup_simple_bike(self) -> None:
         self.simple_frontwheel = SimpleWheel(
