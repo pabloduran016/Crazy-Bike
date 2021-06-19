@@ -27,8 +27,7 @@ class Game(GameProperties):
         self.texture_manager.add()
 
         self.texture_manager.add(('ground', TEXTURES.GROUND), ('grass', TEXTURES.GRASS), ('grass_2', TEXTURES.GRASS_2),
-                                 ('soil', TEXTURES.SOIL))
-
+                                 ('soil', TEXTURES.SOIL), ('border', TEXTURES.BORDER))
         self.data_manager = JsonManager(DATA)
         self.data = self.data_manager.load()
 

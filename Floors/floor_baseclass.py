@@ -2,6 +2,9 @@ import pymunk
 from pymunk import Vec2d, Body as Vec, Body
 from settings.FLOORS import *
 from abc import ABC, abstractmethod
+import pygame
+import pygame.gfxdraw
+from Utilities import scale
 from typing import List, Union, Tuple
 # from game import Physics
 
@@ -42,6 +45,24 @@ class Floor(ABC):
     def update(self) -> None:
         pass
 
+    @property
     @abstractmethod
-    def draw(self) -> None:
+    def drawing_shapes(self):
         pass
+
+    @property
+    @abstractmethod
+    def texture_manager(self):
+        pass
+
+    def draw(self) -> None:
+        offset = self.body.position * self.game.zoom - self.game.camera.position + self.game.displacement
+        for group, tex in self.drawing_shapes:
+            points = [(p + self.body.position) * self.game.zoom - self.game.camera.position + self.game.displacement
+                      for p in group]
+            try:
+                pygame.gfxdraw.textured_polygon(self.game.screen, points,
+                                                scale(self.texture_manager.textures[tex], zoom=self.game.zoom),
+                                                round(offset.x), -round(offset.y))
+            except pygame.error:
+                pass

@@ -21,7 +21,7 @@ CAMERA_FOCUS = (150, 700)
 
 SHAKE = 4
 
-LOADING_IMAGE = 'Assets/Images/loading.png'
+LOADING_IMAGE = 'Assets/Images/Background/loading.png'
 DATA = 'data.json'
 
 SIMPLE_COIN_POSITION = 834, 27

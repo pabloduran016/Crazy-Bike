@@ -1,6 +1,6 @@
 from .colors import *
 
-IMAGE = 'Assets/Images/startscreen2.png'
+IMAGE = 'Assets/Images/Background/startscreen2.png'
 ANIMATION_SIZE = 2
 
 TEXT = (
