@@ -8,6 +8,6 @@ FRICTION = 1
 RADIUS = 1
 
 BORDER_COLOR = BLACK
-BORDER_WIDTH = 5
+BORDER_WIDTH = 2
 
 TEXTURES = {'ground': 'soil', 'grass': 'grass_2', 'border': 'border'}

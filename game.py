@@ -134,8 +134,10 @@ class Game(GameProperties):
             else:
                 self.board.checkground = max(1, self.board.checkground - 1)
                 pass
-        if keys[pg.K_d]:
+        if keys[pg.K_t]:
             self.camera.shake = 8
+        if keys[pg.K_d]:
+            self.camera.position += Vec(40, 0)
         if keys[pg.K_a]:
             self.camera.position += Vec(-40, 0)
         if keys[pg.K_w]:
