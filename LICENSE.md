@@ -1,7 +1,7 @@
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
- Copyright 2021 Pablo Duran <pdrm56@gmail.com>
+ Copyright 2021 Pablo Duran <pdrm56@gmail.com>  
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
