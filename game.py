@@ -9,7 +9,7 @@ from Managers import *
 from Player import BackWheel, FrontWheel, Board
 from Sprites import SpriteGroup, Background, SimpleCoin
 from Utilities import Camera, Physics
-import matplotlib.pylab as plt
+# import matplotlib.pylab as plt
 # from math import sin
 from gameproperties import GameProperties
 
@@ -183,11 +183,12 @@ class Game(GameProperties):
 
 
 if __name__ == '__main__':
-    fig, ax = plt.subplots(3, 1)
-    ax[0].plot(var)
-    ax[0].set_title('lasty')
-    ax[1].plot(var2)
-    ax[1].set_title('zoom')
-    ax[2].set_title('deltavel')
-    ax[2].plot(var3)
-    plt.show()
+    # fig, ax = plt.subplots(3, 1)
+    # ax[0].plot(var)
+    # ax[0].set_title('lasty')
+    # ax[1].plot(var2)
+    # ax[1].set_title('zoom')
+    # ax[2].set_title('deltavel')
+    # ax[2].plot(var3)
+    # plt.show()
+    pass
