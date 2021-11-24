@@ -24,4 +24,4 @@ class JsonManager:
 
     def update(self, data: Dict) -> None:
         with open(self.f, 'w') as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=4)
