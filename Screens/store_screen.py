@@ -8,6 +8,9 @@ from settings import TEXTURES
 from Sprites import SimpleCoin
 from Managers import TextManager
 from .screen_baseclass import Screen
+from Widgets import Button
+from Utilities import scale
+
 
 
 class StoreScreen(Screen):
@@ -33,6 +36,28 @@ class StoreScreen(Screen):
         self.simple_coin.rect.right = self.text_manager.text[4].rect.left - 30
         self.simple_coin.rect.centery = self.text_manager.text[4].rect.centery
         self.store_items = self.load_items()
+
+        self.store_button = Button(image=STORE_BUTTON_IMAGE,
+                                   size=STORE_BUTTON_SIZE,
+                                   center=STORE_BUTTON_center,
+                                   color=WHITE)
+        self.store_button.bind(self.store_click)
+        self.store_button.set_instrucion('draw', self.store_button_draw)
+
+    def store_click(self) -> bool:
+        self.game.waiting = False
+        self.game.screens_manager.current_screen = 'start'
+        return True
+
+    @staticmethod
+    def store_button_draw(button: Button, screen: Union[pg.Surface, pg.SurfaceType]) -> None:
+        pg.draw.rect(screen, button.color, button.rect)
+        pg.draw.rect(screen, BLACK, button.rect, width=4)
+        if button.image is not None:
+            im = scale(button.image, zoom=0.8)
+            rect = im.get_rect()
+            rect.center = button.rect.center
+            screen.blit(im, rect)
 
     def __enter__(self):
         self.reset()
@@ -109,6 +134,7 @@ class StoreScreen(Screen):
                     item.color = RED
             else:
                 item.color = WHITE
+        self.store_button.mouseclick(mouse)
 
     def reset(self) -> None:
         self.text_manager.reset()
@@ -151,5 +177,6 @@ class StoreScreen(Screen):
         self.simple_frontwheel.draw(self.game.screen)
         self.simple_backwheel.draw(self.game.screen)
         self.simple_board.draw(self.game.screen)
+        self.store_button.draw(self.game.screen)
         for item in self.store_items:
             item.draw(self.game.screen)

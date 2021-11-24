@@ -1,5 +1,8 @@
 from settings.GOSCREEN import *
 from Managers import TextManager
+from typing import Union, Tuple, Optional
+from Widgets import Button
+from Utilities import scale
 import pygame as pg
 from settings import FPS
 from .screen_baseclass import Screen
@@ -19,16 +22,43 @@ class GoScreen(Screen):
         self.text_manager.update_rects()
         self.text_manager.set_text_update(self.text_update)
 
-    def __enter__(self):
-        self.game.waiting = True
-        self.reset()
+        self.store_button = Button(image=STORE_BUTTON_IMAGE,
+                                   size=STORE_BUTTON_SIZE,
+                                   center=STORE_BUTTON_center,
+                                   color=WHITE)
+        self.store_button.bind(self.store_click)
+        self.store_button.set_instrucion('draw', self.store_button_draw)
+
+    def store_click(self) -> bool:
+        self.game.waiting = False
+        self.game.screens_manager.current_screen = 'store'
+        return True
+
+    @staticmethod
+    def store_button_draw(button: Button, screen: Union[pg.Surface, pg.SurfaceType]) -> None:
+        pg.draw.rect(screen, button.color, button.rect)
+        pg.draw.rect(screen, BLACK, button.rect, width=4)
+        if button.image is not None:
+            im = scale(button.image, zoom=0.8)
+            rect = im.get_rect()
+            rect.center = button.rect.center
+            screen.blit(im, rect)
 
     def setup(self) -> None:
         self.game.waiting = True
+        self.game.all_sprites.remove(self)
         self.reset()
 
+    def __enter__(self):
+        self.reset()
+        self.game.waiting = True
+        self.game.all_sprites.add(self)
+
     def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
+        self.game.all_sprites.remove(self)
+
+    def mouseclick(self, mouse: Tuple[int, int]) -> Optional[bool]:
+        return self.store_button.mouseclick(mouse)
 
     def run(self) -> None:
         self.game.clock.tick(FPS)
@@ -63,3 +93,4 @@ class GoScreen(Screen):
 
     def draw(self) -> None:
         self.text_manager.draw(self.game.screen)
+        self.store_button.draw(self.game.screen)

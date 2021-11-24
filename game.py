@@ -120,6 +120,7 @@ class Game(GameProperties):
                 captured = self.all_sprites.mouseclick(pg.mouse.get_pos())
                 if pg.mouse.get_pressed(3)[0] and self.waiting and not captured:
                     self.waiting = False
+                    self.screens_manager.current_screen = 'playing'
         self.check_keys()
 
     def check_keys(self, ):
